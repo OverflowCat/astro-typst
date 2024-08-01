@@ -1,0 +1,32 @@
+---
+import { renderToSVGString } from "./typst.ts";
+
+export type Props = {
+    /** Typst code you want to render */
+    code: string;
+    /**
+     * Whether to add default style for anchors to function.
+     *
+     * If you have multiple svg elements in the same page,
+     * you may want to set this to `false`, and import
+     * the stylesheet manually.
+     *
+     * @default true
+     */
+    style?: boolean;
+    /** @default "auto" */
+    width?: number;
+    /** @default "auto" */
+    height?: number;
+    /** @default 16 */
+    remPx?: number;
+    /** @default 2 */
+    scale?: number;
+    [key: string]: any;
+};
+
+const { code, ...options } = Astro.props;
+const svg = await renderToSVGString(code, options);
+---
+
+<div set:html={svg} />

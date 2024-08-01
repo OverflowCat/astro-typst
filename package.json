@@ -1,0 +1,22 @@
+{
+  "name": "astro.typst",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "pack": "",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.1",
+    "@myriaddreamin/typst-ts-node-compiler": "0.5.0-rc6",
+    "astro": "^4.11",
+    "cheerio": "1.0.0-rc.12",
+    "html-loader": "^5.1.0",
+    "typescript": "^5.5",
+    "vite": "^5.3"
+  }
+}
