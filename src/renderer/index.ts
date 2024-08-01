@@ -1,4 +1,5 @@
 import type { NamedSSRLoadedRendererValue, SSRResult } from "astro";
+import type { TypstComponent } from "../lib/vite.js";
 
 async function check(
     t: any,
@@ -7,15 +8,11 @@ async function check(
     children: any
 ) {
     // console.log('check', { Component: Component.prototype, props, children, t });
-    return !children && !Component?.prototype &&
-        (
-            t?.startsWith('<html><head></head><body><svg class="typst-doc"') ||
-            t.startsWith('<svg class="typst-doc"')
-        );
+    return t?.name == 'TypstComponent' && !children;
 }
 
-async function renderToStaticMarkup(html: string, attrs: {}) {
-    return { attrs: {}, html }
+async function renderToStaticMarkup(t: TypstComponent, attrs: {}) {
+    return { attrs: {}, html: t.svg }
 }
 
 const renderer: NamedSSRLoadedRendererValue = {

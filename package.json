@@ -7,7 +7,11 @@
     "url": "https://github.com/OverflowCat/astro-typst.git"
   },
   "description": "Use Typst within Astro",
-  "version": "0.2.4",
+  "keywords": [
+    "astro",
+    "typst"
+  ],
+  "version": "0.2.6",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "author": {
@@ -16,13 +20,17 @@
     "url": "https://overflow.cat"
   },
   "license": "MIT",
-  "files": ["src", "public"],
+  "files": [
+    "src",
+    "public"
+  ],
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
     "compile": "tsc",
     "preview": "astro preview",
+    "pub": "pnpm compile && pnpm publish --no-git-checks",
     "astro": "astro"
   },
   "dependencies": {
