@@ -1,10 +1,12 @@
 ---
-import Typst from "../lib/Typst.astro";
+import Typst from "../components/Typst.astro";
 
 const code = `
-#let a = 114
-#let b = 514
+#set page(margin: .1cm)
+#let a = 123
+#let b = 456
 #(str(a) + str(b))
+Typst $oo$
 `
 ---
 
@@ -17,7 +19,7 @@ const code = `
 		<title>Astro</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<h1><samp>astro-typst</samp> component playground</h1>
 		<main>
 			<Typst code={code} style={true}></Typst>
 		</main>

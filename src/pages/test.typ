@@ -1,4 +1,7 @@
 #set text(lang: "zh", font: "Noto Sans CJK SC")
+#set par(leading: 1em)
+
+== `astro-typst` playground
 
 #let astro = image.decode("
 <svg width='460' height='160' viewBox='0 0 460 160' fill='none' xmlns='http://www.w3.org/2000/svg'>
@@ -45,5 +48,3 @@ $ f(t, z) CONV h(t, z) = INTOO INTOO f(alpha, beta) h(t - alpha, z - beta) dif a
   square(fill: gradient.radial(..color.map.rainbow)),
   square(fill: gradient.conic(..color.map.rainbow)),
 )
-
-$  $
