@@ -1,12 +1,14 @@
 import type { AstroIntegration, AstroRenderer, ContentEntryType, HookParameters } from "astro";
-import vitePluginTypst from "./vite"
+import vitePluginTypst from "./vite.js"
 
 const PACKAGE_NAME = 'astro-typst'
+const isDebug = false;
+const root = isDebug ? "" : "astro-typst/";
 
 function getRenderer(): AstroRenderer {
     return {
         name: PACKAGE_NAME,
-        serverEntrypoint: 'src/renderer/index.js',
+        serverEntrypoint: root + 'src/renderer/index.js',
     };
 }
 

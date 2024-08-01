@@ -1,18 +1,20 @@
 import type { NamedSSRLoadedRendererValue, SSRResult } from "astro";
-type RendererContext = {
-    result: SSRResult;
-};
 
-async function check(t: RendererContext,
+async function check(
+    t: any,
     Component: any,
     props: Record<string, any>,
     children: any
 ) {
-    console.log('check', t, Component, props, children)
-    return true;
+    // console.log('check', { Component: Component.prototype, props, children, t });
+    return !Component?.prototype &&
+        (
+            t?.startsWith('<html><head></head><body><svg class="typst-doc"') ||
+            t.startsWith('<svg class="typst-doc"')
+        );
 }
+
 async function renderToStaticMarkup(html: string, attrs: {}) {
-    console.log('renderToStaticMarkup', attrs, html)
     return { attrs: {}, html }
 }
 

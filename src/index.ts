@@ -1,5 +1,5 @@
-import typst from "./lib/integration";
-import vitePluginTypst from "./lib/vite";
+import typst from "./lib/integration.js";
+import vitePluginTypst from "./lib/vite.js";
 
 export {
     typst,

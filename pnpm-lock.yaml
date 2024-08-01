@@ -24,6 +24,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.9
         version: 0.9.1(typescript@5.5.4)
+      '@types/node':
+        specifier: ^22.0.2
+        version: 22.0.2
       typescript:
         specifier: ^5.5
         version: 5.5.4
@@ -2532,7 +2535,6 @@ snapshots:
   '@types/node@22.0.2':
     dependencies:
       undici-types: 6.11.1
-    optional: true
 
   '@types/unist@3.0.2': {}
 
@@ -3978,8 +3980,7 @@ snapshots:
 
   typescript@5.5.4: {}
 
-  undici-types@6.11.1:
-    optional: true
+  undici-types@6.11.1: {}
 
   unified@11.0.5:
     dependencies:

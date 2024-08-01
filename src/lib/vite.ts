@@ -1,4 +1,4 @@
-import { renderToSVGString } from "./typst";
+import { renderToSVGString } from "./typst.js";
 
 export default function () {
     return {
