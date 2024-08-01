@@ -7,7 +7,7 @@ async function check(
     children: any
 ) {
     // console.log('check', { Component: Component.prototype, props, children, t });
-    return !Component?.prototype &&
+    return !children && !Component?.prototype &&
         (
             t?.startsWith('<html><head></head><body><svg class="typst-doc"') ||
             t.startsWith('<svg class="typst-doc"')

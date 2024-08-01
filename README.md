@@ -27,7 +27,7 @@ Then you can use `.typ` files just like anything else in Astro: render directly 
 
 ### As a component
 
-![](https://github.com/user-attachments/assets/613eaf8e-53da-4cf0-bbaa-f32592d7f742)
+<img src="https://github.com/user-attachments/assets/613eaf8e-53da-4cf0-bbaa-f32592d7f742" alt="Demo" width="400" />
 
 ```astro
 ---
@@ -61,4 +61,18 @@ y = C x = mat(delim: "[", 0, 0, dots.h.c, 1) x
 ---
 
 <Typst code={code} />
+```
+
+## Development
+
+### Playground
+
+```bash
+pnpm dev
+```
+
+### Build package
+
+```bash
+pnpm compile
 ```

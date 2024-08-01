@@ -7,8 +7,9 @@
     "url": "https://github.com/OverflowCat/astro-typst.git"
   },
   "description": "Use Typst within Astro",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "main": "src/index.js",
+  "types": "src/index.d.ts",
   "author": {
     "name": "OverflowCat",
     "email": "overflowcat@gmail.com",

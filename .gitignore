@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 *.js
 *.d.ts
+*.d.ts.map

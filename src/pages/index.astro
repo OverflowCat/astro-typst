@@ -1,5 +1,6 @@
 ---
 import Typst from "../components/Typst.astro";
+import Simp from "./simp.typ";
 
 const code = `
 #set page(margin: .1cm)
@@ -7,7 +8,7 @@ const code = `
 #let b = 456
 #(str(a) + str(b))
 Typst $oo$
-`
+`;
 ---
 
 <html lang="en">
@@ -21,7 +22,8 @@ Typst $oo$
 	<body>
 		<h1><samp>astro-typst</samp> component playground</h1>
 		<main>
-			<Typst code={code} style={true}></Typst>
+			<Typst code={code} style={true} />
+			<Simp />
 		</main>
 	</body>
 </html>
