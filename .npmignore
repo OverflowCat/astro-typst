@@ -1,4 +1,4 @@
 public
 src/pages
 
-*.ts
+src/*.ts

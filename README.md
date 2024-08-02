@@ -2,10 +2,27 @@
 
 An Astro Integration that lets you render Typst within Astro.
 
+<img src="https://github.com/user-attachments/assets/613eaf8e-53da-4cf0-bbaa-f32592d7f742" alt="Demo" width="400" />
+
+## Features
+
+- [x] Import packages in [Typst Universe](https://typst.app/universe/)
+- [x] `import` / `include` / `read` files or resources
+- [x] Use system fonts
+- [x] Selectable, clickable text layer
+- [x] Set scale
+- [x] Static SVGs without JavaScript
+- [ ] Responsive SVGs
+- [ ] Add font files or blobs
+
 ## Installation
 
 ```bash
 npm install astro-typst
+# or
+pnpm add astro-typst
+# or
+yarn add astro-typst
 ```
 
 ## Usage
@@ -27,7 +44,33 @@ Then you can use `.typ` files just like anything else in Astro: render directly 
 
 ### As a component
 
-<img src="https://github.com/user-attachments/assets/613eaf8e-53da-4cf0-bbaa-f32592d7f742" alt="Demo" width="400" />
+To use the component, you need to manually install a dependency to avoid SSR errors:
+
+```
+npm install @myriaddreamin/typst-ts-node-compiler
+# or
+pnpm add @myriaddreamin/typst-ts-node-compiler
+# or
+yarn add @myriaddreamin/typst-ts-node-compiler
+```
+
+and add this to your `/astro.config.(t|j)s/`:
+
+```diff
+export default defineConfig({
+  ...,
+  vite: {
+    ssr: {
+-      external: [...],
++      external: [..., "@myriaddreamin/typst-ts-node-compiler"],
+    },
+    ...,
+  },
+  ...,
+});
+```
+
+Then, you can pass either one of `code | src | input` to the component:
 
 ```astro
 ---
