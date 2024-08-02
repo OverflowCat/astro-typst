@@ -1,5 +1,6 @@
 import type { AstroIntegration, AstroRenderer, ContentEntryType, HookParameters } from "astro";
 import vitePluginTypst from "./vite.js"
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const PACKAGE_NAME = 'astro-typst'
 const isDebug = false;
@@ -30,7 +31,12 @@ const typstIntegration: AstroIntegration = {
             addPageExtension('.typ');
             updateConfig({
                 vite: {
-                    plugins: [vitePluginTypst()],
+                    build: {
+                        rollupOptions: {
+                            external: ["@myriaddreamin/typst-ts-node-compiler"]
+                        }
+                    },
+                    plugins: [nodeResolve(), vitePluginTypst()],
                 },
             });
         },

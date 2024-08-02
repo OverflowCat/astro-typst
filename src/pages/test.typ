@@ -1,7 +1,12 @@
 #set text(lang: "zh", font: "Noto Sans CJK SC")
 #set par(leading: 1em)
+#set page(width: auto, height: auto, margin: 0.5em)
 
 == `astro-typst` playground
+
+=== Include other files
+
+#include "_included.typ"
 
 #let astro = image.decode("
 <svg width='460' height='160' viewBox='0 0 460 160' fill='none' xmlns='http://www.w3.org/2000/svg'>

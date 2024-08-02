@@ -7,10 +7,15 @@ export type TypstComponent = {
 export default function () {
     return {
         name: 'vite-plugin-typ',
-        async transform(code: string, id: string) {
+        async transform(_code: string, id: string) {
             if (id.endsWith('.typ')) {
                 try {
-                    const svg = await renderToSVGString(code, {});
+                    const svg = await renderToSVGString(
+                        {
+                            mainFilePath: id
+                        },
+                        {
+                        });
                     const component: TypstComponent = {
                         name: "TypstComponent",
                         svg

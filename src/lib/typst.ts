@@ -1,11 +1,30 @@
-import { NodeCompiler } from "@myriaddreamin/typst-ts-node-compiler";
+import { NodeCompiler, type CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler/index.js";
 import { load } from "cheerio";
+
+/**
+ * Either a string or an object for multiple files.
+*/
+export type TypstDocInput = CompileDocArgs | string;
 
 let compilerIns: NodeCompiler | undefined;
 
-export async function renderToSVGString(code: string, options: any) {
-    const $typst = (compilerIns ||= NodeCompiler.create());
-    const res = renderToSVGString_($typst, code, options);
+/**
+ *
+ * @param source The source code of the .typ file.
+ * @param options Options for rendering the SVG.
+ * @returns The SVG string.
+ */
+export async function renderToSVGString(source: TypstDocInput, options: any) {
+    const $typst = (compilerIns ||= NodeCompiler.create({
+        workspace: "./", // default
+    }));
+    if (typeof source === "string") {
+        const width = options.width || "auto";
+        const height = options.height || "auto";
+        const mainFileContent = `#set page(height: ${height}, width: ${width}, margin: 0pt)\n${source}`;
+        source = { mainFileContent };
+    }
+    const res = renderToSVGString_($typst, source);
     $typst.evictCache(10);
     const { svg } = await res;
     const $ = load(svg);
@@ -29,14 +48,9 @@ export async function renderToSVGString(code: string, options: any) {
 
 async function renderToSVGString_(
     $typst: NodeCompiler,
-    code: string,
-    options: any,
+    source: CompileDocArgs,
 ) {
-    const width = options.width || "auto";
-    const height = options.height || "auto";
-    const template = `#set page(height: ${height}, width: ${width}, margin: 0pt)\n${code}`;
-    const mainFileContent = template;
-    const docRes = $typst.compile({ mainFileContent });
+    const docRes = $typst.compile(source);
     if (!docRes.result) {
         const diags = $typst.fetchDiagnostics(docRes.takeDiagnostics()!);
         console.error(diags);

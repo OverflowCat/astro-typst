@@ -1,9 +1,14 @@
 ---
-import { renderToSVGString } from "../lib/typst.js";
+import { renderToSVGString, type TypstDocInput } from "../lib/typst.js";
 
-export type Props = {
-    /** Typst code you want to render */
-    code: string;
+export type Props = (
+    | { code: string }
+    | { src: string }
+    | { input: TypstDocInput }
+) &
+    TypstOptions;
+
+export type TypstOptions = {
     /**
      * Whether to add default style for anchors to function.
      *
@@ -22,11 +27,17 @@ export type Props = {
     remPx?: number;
     /** @default 2 */
     scale?: number;
-    [key: string]: any;
 };
 
-const { code, ...options } = Astro.props;
-const svg = await renderToSVGString(code, options);
+const options = Astro.props;
+let input: TypstDocInput =
+    "src" in options
+        ? { mainFilePath: options.src }
+        : "code" in options
+          ? options.code
+          : options.input;
+
+const svg = await renderToSVGString(input, options);
 ---
 
 <div set:html={svg} />

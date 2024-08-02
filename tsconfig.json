@@ -1,6 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "globals.d.ts"],
   "compilerOptions": {
     "allowImportingTsExtensions": false,
     "noEmit": false,

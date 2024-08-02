@@ -1,10 +1,10 @@
-import type { NamedSSRLoadedRendererValue, SSRResult } from "astro";
+import type { NamedSSRLoadedRendererValue } from "astro";
 import type { TypstComponent } from "../lib/vite.js";
 
 async function check(
     t: any,
-    Component: any,
-    props: Record<string, any>,
+    _Component: any,
+    _props: Record<string, any>,
     children: any
 ) {
     // console.log('check', { Component: Component.prototype, props, children, t });
@@ -12,7 +12,7 @@ async function check(
 }
 
 async function renderToStaticMarkup(t: TypstComponent, attrs: {}) {
-    return { attrs: {}, html: t.svg }
+    return { attrs, html: t.svg }
 }
 
 const renderer: NamedSSRLoadedRendererValue = {

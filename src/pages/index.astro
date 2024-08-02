@@ -1,5 +1,6 @@
 ---
 import Typst from "../components/Typst.astro";
+import { TypstDocInput } from "../lib/typst.js";
 import Simp from "./simp.typ";
 
 const code = `
@@ -9,6 +10,9 @@ const code = `
 #(str(a) + str(b))
 Typst $oo$
 `;
+const input: TypstDocInput = {
+	mainFilePath: "src/pages/test.typ",
+};
 ---
 
 <html lang="en">
@@ -22,7 +26,9 @@ Typst $oo$
 	<body>
 		<h1><samp>astro-typst</samp> component playground</h1>
 		<main>
-			<Typst code={code} style={true} />
+			<Typst code={code} />
+			<Typst input={input} />
+			<Typst src={input.mainFilePath!} />
 			<Simp />
 		</main>
 	</body>
