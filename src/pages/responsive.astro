@@ -1,0 +1,20 @@
+---
+import Typst from "../components/Responsive.astro";
+import { TypstDocInput } from "../lib/typst.js";
+
+const code = `
+#set page(width: 12em)
+#let a = 123
+#let b = 456
+#(str(a) + str(b)) Astro Typst Hello World
+从军征遐路，讨彼东南夷。方舟顺广川，薄暮未安坻。白日半西山，桑梓有馀晖。蟋蟀夹岸鸣，孤鸟翩翩飞。征夫心多怀，凄凄令吾悲。下船登高防，草露沾我衣。回身赴床寝，此愁当告谁。身服干戈事，岂得念所私。即戎有授命，兹理不可违。
+$oo$ $display(lim_(x → 0))$
+$ cal(A) :=
+    { x in RR | x "is natural" } $
+`;
+const input: TypstDocInput = {
+    mainFilePath: "src/pages/test.typ",
+};
+---
+
+<Typst code={code} />
