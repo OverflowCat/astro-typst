@@ -3,7 +3,7 @@ import vitePluginTypst from "./vite.js"
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const PACKAGE_NAME = 'astro-typst'
-const isDebug = false;
+const isDebug = true;
 const root = isDebug ? "" : "astro-typst/";
 
 function getRenderer(): AstroRenderer {

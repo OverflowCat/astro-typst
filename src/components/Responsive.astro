@@ -20,9 +20,9 @@ export type TypstOptions = {
      */
     style?: boolean;
     /** @default "auto" */
-    width?: number;
+    width?: number | string;
     /** @default "auto" */
-    height?: number;
+    height?: number | string;
     /** @default 16 */
     remPx?: number;
     /** @default 2 */
@@ -38,6 +38,7 @@ let input: TypstDocInput =
           : options.input;
 
 const vectorArtifact = await renderToVectorFormat(input, options);
+console.info({ vectorArtifact, length: vectorArtifact.length });
 ---
 
 <script is:inline define:vars={{ vectorArtifact }}>
@@ -53,22 +54,66 @@ const vectorArtifact = await renderToVectorFormat(input, options);
         getModule: () =>
             "/node_modules/@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm",
     };
-    const mainContent = "Hello, typst!";
     const doRender = (renderer) => {
-        const divElem = document.getElementById("typ");
+        const divElem = document.getElementById("typ-container");
         if (!divElem || !window["vectorArtifact"]) {
             return;
         }
-        const artifactContent = new Uint8Array(window["vectorArtifact"]);
-        console.log(artifactContent);
-        return renderer.render({
-            artifactContent,
-            format: "vector",
-            backgroundColor: "white",
-            container: divElem,
-            pixelPerPt: 8,
-        });
+        const artifactContent = new Uint8Array(window["vectorArtifact"].data);
+        console.log(artifactContent, artifactContent.length);
+        renderer
+            .renderDom({
+                artifactContent,
+                format: "vector",
+                backgroundColor: "#ffffff",
+                container: divElem,
+                pixelPerPt: 8,
+                domScale: 2,
+            })
+            .then((dom) => {
+                console.log("rendered", dom);
+                dom.addChangement([
+                    "new",
+                    artifactContent as unknown as string,
+                ]);
+            });
     };
-    withGlobalRenderer(typst.createTypstRenderer, moduleInitOptions, doRender);
+    const reRender = () => {
+        withGlobalRenderer(
+            typst.createTypstRenderer,
+            moduleInitOptions,
+            doRender,
+        );
+    };
+    const throttle = (func, limit) => {
+        let inThrottle;
+        return function () {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => (inThrottle = false), limit);
+            }
+        };
+    };
+    document.addEventListener("DOMContentLoaded", () => {
+        const container = document.getElementById("typ-container")!;
+        console.log(container);
+        reRender();
+        // const throttledReRender = throttle(reRender, 100);
+        // const resizeObserver = new ResizeObserver(throttledReRender);
+        // resizeObserver.observe(container);
+    });
 </script>
-<div id="typ"></div>
+
+<div id="typ-container"></div>
+<style>
+    #typ {
+        resize: both;
+        max-width: 700px;
+        min-width: 300px;
+        border: 1px solid #000;
+        overflow: hidden; /* something other than visible */
+    }
+</style>

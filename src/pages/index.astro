@@ -1,5 +1,5 @@
 ---
-import Typst from "../components/Typst.astro";
+import Typst from "../components/Responsive.astro";
 import { TypstDocInput } from "../lib/typst.js";
 import Simp from "./simp.typ";
 
@@ -8,6 +8,7 @@ const code = `
 #let a = 123
 #let b = 456
 #(str(a) + str(b)) Astro Typst Hello World
+从军征遐路，讨彼东南夷。方舟顺广川，薄暮未安坻。白日半西山，桑梓有馀晖。蟋蟀夹岸鸣，孤鸟翩翩飞。征夫心多怀，凄凄令吾悲。下船登高防，草露沾我衣。回身赴床寝，此愁当告谁。身服干戈事，岂得念所私。即戎有授命，兹理不可违。
 $oo$ $display(lim_(x → 0))$
 $ cal(A) :=
     { x in RR | x "is natural" } $
@@ -35,11 +36,11 @@ const input: TypstDocInput = {
 					>height</code
 				> set to <samp>"auto"</samp>
 			</h3>
-			<Typst code={code} width={"100%"} height={"auto"} />
+			<!-- <Typst code={code} width={"100%"} height={"auto"} /> -->
 			<h2>2: <code>TypstDocInput</code></h2>
-			<Typst input={input} />
+			<!-- <Typst input={input} /> -->
 			<h2>3: <code>mainFilePath</code></h2>
-			<Typst src={input.mainFilePath!} />
+			<!-- <Typst src={input.mainFilePath!} /> -->
 			<h2>4: <samp>simp.typ</samp></h2>
 			<Simp />
 		</main>
