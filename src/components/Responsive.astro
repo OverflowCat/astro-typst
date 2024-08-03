@@ -1,0 +1,74 @@
+---
+import { renderToVectorFormat, type TypstDocInput } from "../lib/typst.js";
+
+export type Props = (
+    | { code: string }
+    | { src: string }
+    | { input: TypstDocInput }
+) &
+    TypstOptions;
+
+export type TypstOptions = {
+    /**
+     * Whether to add default style for anchors to function.
+     *
+     * If you have multiple svg elements in the same page,
+     * you may want to set this to `false`, and import
+     * the stylesheet manually.
+     *
+     * @default true
+     */
+    style?: boolean;
+    /** @default "auto" */
+    width?: number;
+    /** @default "auto" */
+    height?: number;
+    /** @default 16 */
+    remPx?: number;
+    /** @default 2 */
+    scale?: number;
+};
+
+const options = Astro.props;
+let input: TypstDocInput =
+    "src" in options
+        ? { mainFilePath: options.src }
+        : "code" in options
+          ? options.code
+          : options.input;
+
+const vectorArtifact = await renderToVectorFormat(input, options);
+---
+
+<script is:inline define:vars={{ vectorArtifact }}>
+    window.vectorArtifact = vectorArtifact;
+</script>
+<script>
+    // @ts-ignore
+    import { withGlobalRenderer } from "@myriaddreamin/typst.ts/dist/esm/contrib/global-renderer.mjs";
+    // @ts-ignore
+    import * as typst from "@myriaddreamin/typst.ts";
+    const moduleInitOptions = {
+        beforeBuild: [],
+        getModule: () =>
+            "/node_modules/@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm",
+    };
+    const mainContent = "Hello, typst!";
+    const doRender = (renderer) => {
+        const divElem = document.getElementById("typ");
+        if (!divElem || !window["vectorArtifact"]) {
+            return;
+        }
+        const artifactContent = new Uint8Array(window["vectorArtifact"]);
+        console.log(artifactContent);
+        return renderer.render({
+            artifactContent,
+            format: "vector",
+            backgroundColor: "white",
+            container: divElem,
+            pixelPerPt: 8,
+        });
+    };
+    withGlobalRenderer(typst.createTypstRenderer, moduleInitOptions, doRender);
+</script>
+<div id="typ"></div>

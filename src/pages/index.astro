@@ -4,11 +4,13 @@ import { TypstDocInput } from "../lib/typst.js";
 import Simp from "./simp.typ";
 
 const code = `
-#set page(margin: .1cm)
+#set page(margin: .1cm, width: auto, height: auto)
 #let a = 123
 #let b = 456
-#(str(a) + str(b))
-Typst $oo$
+#(str(a) + str(b)) Astro Typst Hello World
+$oo$ $display(lim_(x → 0))$
+$ cal(A) :=
+    { x in RR | x "is natural" } $
 `;
 const input: TypstDocInput = {
 	mainFilePath: "src/pages/test.typ",
@@ -26,9 +28,19 @@ const input: TypstDocInput = {
 	<body>
 		<h1><samp>astro-typst</samp> component playground</h1>
 		<main>
+			<h2>1: string code</h2>
 			<Typst code={code} />
+			<h3>
+				<code>width</code> set to <samp>"100%"</samp> and <code
+					>height</code
+				> set to <samp>"auto"</samp>
+			</h3>
+			<Typst code={code} width={"100%"} height={"auto"} />
+			<h2>2: <code>TypstDocInput</code></h2>
 			<Typst input={input} />
+			<h2>3: <code>mainFilePath</code></h2>
 			<Typst src={input.mainFilePath!} />
+			<h2>4: <samp>simp.typ</samp></h2>
 			<Simp />
 		</main>
 	</body>

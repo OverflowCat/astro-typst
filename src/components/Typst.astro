@@ -19,10 +19,20 @@ export type TypstOptions = {
      * @default true
      */
     style?: boolean;
-    /** @default "auto" */
-    width?: number;
-    /** @default "auto" */
-    height?: number;
+    /**
+     * The width of the SVG element.
+     * If not set, the width will be calculated based on the content.
+     * You may want to set this to `"100%"` to fit the container.`
+     *  @default undefined */
+    width?: string | number;
+    /**
+     * The height of the SVG element.
+     * If not set, the height will be calculated based on the content.
+     * You may want to set this to `"auto"` to fit the container.
+     *  @default undefined */
+    height?: string | number;
+    /** @default {} */
+    props?: Record<string, string>;
     /** @default 16 */
     remPx?: number;
     /** @default 2 */

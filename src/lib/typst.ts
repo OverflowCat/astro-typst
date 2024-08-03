@@ -8,6 +8,20 @@ export type TypstDocInput = CompileDocArgs | string;
 
 let compilerIns: NodeCompiler | undefined;
 
+function prepareSource(source: TypstDocInput, _options: any) {
+    if (typeof source === "string") {
+        source = { mainFileContent: source };
+    }
+    return source;
+}
+
+function getOrInitCompiler(): NodeCompiler {
+    return (compilerIns ||= NodeCompiler.create({
+        workspace: "./", // default
+    }));
+}
+
+
 /**
  *
  * @param source The source code of the .typ file.
@@ -15,33 +29,36 @@ let compilerIns: NodeCompiler | undefined;
  * @returns The SVG string.
  */
 export async function renderToSVGString(source: TypstDocInput, options: any) {
-    const $typst = (compilerIns ||= NodeCompiler.create({
-        workspace: "./", // default
-    }));
-    if (typeof source === "string") {
-        const width = options.width || "auto";
-        const height = options.height || "auto";
-        const mainFileContent = `#set page(height: ${height}, width: ${width}, margin: 0pt)\n${source}`;
-        source = { mainFileContent };
-    }
+    source = prepareSource(source, options);
+    const $typst = getOrInitCompiler();
     const res = renderToSVGString_($typst, source);
     $typst.evictCache(10);
     const { svg } = await res;
     const $ = load(svg);
     const remPx = options.remPx || 16;
-    const width = $("svg").attr("width");
-    const height = $("svg").attr("height");
-    if (!width || !height) {
-        return svg;
-    }
 
-    const remWidth = parseFloat(width) * 2 / remPx;
-    const remHeight = parseFloat(height) * 2 / remPx;
-    $("svg").attr("width", `${remWidth}rem`);
-    $("svg").attr("height", `${remHeight}rem`);
+    const width = $("svg").attr("width");
+    if (options.width === undefined && width !== undefined) {
+        const remWidth = parseFloat(width) * 2 / remPx;
+        $("svg").attr("width", `${remWidth}rem`);
+    } else {
+        $("svg").attr("width", options.width);
+    }
+    const height = $("svg").attr("height");
+    if (options.height === undefined && height !== undefined) {
+        const remHeight = parseFloat(height) * 2 / remPx;
+        $("svg").attr("height", `${remHeight}rem`);
+    } else {
+        $("svg").attr("height", options.height);
+    }
 
     if (options.style === false) {
         $("style").remove();
+    }
+    if (options.props) {
+        for (const [key, value] of Object.entries(options.props)) {
+            $("svg").attr(key, value as any);
+        }
     }
     return $.html();
 }
@@ -57,7 +74,16 @@ async function renderToSVGString_(
         return { svg: "" };
     }
     const doc = docRes.result;
-
     const svg = $typst.svg(doc);
     return { svg };
+}
+
+export async function renderToVectorFormat(
+    source: TypstDocInput,
+    options: any,
+) {
+    source = prepareSource(source, options);
+    const $typst = getOrInitCompiler();
+    const vector = $typst.vector(source);
+    return vector;
 }

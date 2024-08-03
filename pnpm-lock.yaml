@@ -11,12 +11,18 @@ importers:
       '@myriaddreamin/typst-ts-node-compiler':
         specifier: 0.5.0-rc6
         version: 0.5.0-rc6
+      '@myriaddreamin/typst-ts-renderer':
+        specifier: 0.5.0-rc6
+        version: 0.5.0-rc6
+      '@myriaddreamin/typst.ts':
+        specifier: 0.5.0-rc6
+        version: 0.5.0-rc6(@myriaddreamin/typst-ts-renderer@0.5.0-rc6)
       '@rollup/plugin-node-resolve':
         specifier: ^15.2.3
         version: 15.2.3(rollup@4.19.1)
       astro:
-        specifier: ^4.11
-        version: 4.12.3(@types/node@22.0.2)(terser@5.31.3)(typescript@5.5.4)
+        specifier: ^4.13
+        version: 4.13.1(@types/node@22.0.2)(terser@5.31.3)(typescript@5.5.4)
       cheerio:
         specifier: 1.0.0-rc.12
         version: 1.0.0-rc.12
@@ -28,7 +34,7 @@ importers:
         specifier: ^0.9
         version: 0.9.1(typescript@5.5.4)
       '@types/node':
-        specifier: ^22.0.2
+        specifier: ^22
         version: 22.0.2
       typescript:
         specifier: ^5.5
@@ -532,6 +538,20 @@ packages:
     resolution: {integrity: sha512-GE4j5dizqSBzmRCMgVQJp4Nq75ynPeYLm8cBwM8JYzArN8Hw6vu1gv8qg3zX+ls6zelSDxjUsFHKSnXUS9untg==}
     engines: {node: '>= 10'}
 
+  '@myriaddreamin/typst-ts-renderer@0.5.0-rc6':
+    resolution: {integrity: sha512-iE+pTxrVe9jDl1poih6yWHZyKDzOCu2ej8ODi3d325wheC9c5mq1wbEEcXPNguEthgAI/VWdd91loLnY1ufroQ==}
+
+  '@myriaddreamin/typst.ts@0.5.0-rc6':
+    resolution: {integrity: sha512-3sMH0lt4cVtx9wczaoNKW+MWHfPjc+J+r5no/upZhHn2kf1QVUKY0ovy8O6Y3PMRUzq4GSwp+l33uNg9lC2Bjg==}
+    peerDependencies:
+      '@myriaddreamin/typst-ts-renderer': ^0.5.0-rc6
+      '@myriaddreamin/typst-ts-web-compiler': ^0.5.0-rc6
+    peerDependenciesMeta:
+      '@myriaddreamin/typst-ts-renderer':
+        optional: true
+      '@myriaddreamin/typst-ts-web-compiler':
+        optional: true
+
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -763,8 +783,8 @@ packages:
   array-iterate@2.0.1:
     resolution: {integrity: sha512-I1jXZMjAgCMmxT4qxXfPXa6SthSoE8h6gkSI9BGGNv8mP8G/v0blc+qFnZu6K42vTOiuME596QaLO0TP3Lk0xg==}
 
-  astro@4.12.3:
-    resolution: {integrity: sha512-rFcRktbZk8CsHufLOB51gYAia3RTuOyaBD8iZXRHP7Oqo6QviquNaa/5U6RoUqyF5KS8vyq/ldJ5jfboJzxuuw==}
+  astro@4.13.1:
+    resolution: {integrity: sha512-VnMjAc+ykFsIVjgbu9Mt/EA1fMIcPMXbU89h3ATwGOzSIKDsQH72bDgfJkWiwk6u0OE90GeP5EPhAT28Twf9oA==}
     engines: {node: ^18.17.1 || ^20.3.0 || >=21.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -1165,6 +1185,9 @@ packages:
   human-signals@5.0.0:
     resolution: {integrity: sha512-AXcZb6vzzrFAUE61HnN4mpLqd/cSIwNQjtNWR0euPm6y0iqx3G4gOXaIDdtdDwZmhwe82LA6+zinmW4UBWVePQ==}
     engines: {node: '>=16.17.0'}
+
+  idb@7.1.1:
+    resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
 
   import-meta-resolve@4.1.0:
     resolution: {integrity: sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==}
@@ -2489,6 +2512,14 @@ snapshots:
       '@myriaddreamin/typst-ts-node-compiler-win32-arm64-msvc': 0.5.0-rc6
       '@myriaddreamin/typst-ts-node-compiler-win32-x64-msvc': 0.5.0-rc6
 
+  '@myriaddreamin/typst-ts-renderer@0.5.0-rc6': {}
+
+  '@myriaddreamin/typst.ts@0.5.0-rc6(@myriaddreamin/typst-ts-renderer@0.5.0-rc6)':
+    dependencies:
+      idb: 7.1.1
+    optionalDependencies:
+      '@myriaddreamin/typst-ts-renderer': 0.5.0-rc6
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -2718,7 +2749,7 @@ snapshots:
 
   array-iterate@2.0.1: {}
 
-  astro@4.12.3(@types/node@22.0.2)(terser@5.31.3)(typescript@5.5.4):
+  astro@4.13.1(@types/node@22.0.2)(terser@5.31.3)(typescript@5.5.4):
     dependencies:
       '@astrojs/compiler': 2.10.1
       '@astrojs/internal-helpers': 0.4.1
@@ -2736,7 +2767,6 @@ snapshots:
       aria-query: 5.3.0
       axobject-query: 4.1.0
       boxen: 7.1.1
-      chokidar: 3.6.0
       ci-info: 4.0.0
       clsx: 2.1.1
       common-ancestor-path: 1.0.1
@@ -3250,6 +3280,8 @@ snapshots:
   http-cache-semantics@4.1.1: {}
 
   human-signals@5.0.0: {}
+
+  idb@7.1.1: {}
 
   import-meta-resolve@4.1.0: {}
 
