@@ -1,4 +1,4 @@
-import { NodeCompiler, type CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler/index.js";
+import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler/index.js";
 import { load } from "cheerio";
 
 /**
@@ -7,6 +7,7 @@ import { load } from "cheerio";
 export type TypstDocInput = CompileDocArgs | string;
 
 let compilerIns: NodeCompiler | undefined;
+let dynCompilerIns: DynLayoutCompiler | undefined;
 
 function prepareSource(source: TypstDocInput, _options: any) {
     if (typeof source === "string") {
@@ -21,9 +22,26 @@ function getOrInitCompiler(): NodeCompiler {
     }));
 }
 
+function getOrInitDynCompiler(): DynLayoutCompiler {
+    return (dynCompilerIns ||= DynLayoutCompiler.fromBoxed(
+        getOrInitCompiler().intoBoxed(),
+    ));
+}
+
+export function getFrontmatter($typst: NodeCompiler, source: CompileDocArgs) {
+    var frontmatter: Record<string, any> = {};
+    try {
+        const data = $typst.query(source, { selector: "<frontmatter>" })
+        if (data?.length > 0) {
+            frontmatter = data[0].value;
+        }
+    } catch (error) {
+        console.warn("Error querying frontmatter", error);
+    }
+    return frontmatter;
+}
 
 /**
- *
  * @param source The source code of the .typ file.
  * @param options Options for rendering the SVG.
  * @returns The SVG string.
@@ -31,9 +49,8 @@ function getOrInitCompiler(): NodeCompiler {
 export async function renderToSVGString(source: TypstDocInput, options: any) {
     source = prepareSource(source, options);
     const $typst = getOrInitCompiler();
-    const res = renderToSVGString_($typst, source);
+    const svg = await renderToSVGString_($typst, source);
     $typst.evictCache(10);
-    const { svg } = await res;
     const $ = load(svg);
     const remPx = options.remPx || 16;
 
@@ -60,22 +77,22 @@ export async function renderToSVGString(source: TypstDocInput, options: any) {
             $("svg").attr(key, value as any);
         }
     }
-    return $.html();
+    return { svg: $.html(), frontmatter: () => getFrontmatter($typst, source) };
 }
 
 async function renderToSVGString_(
     $typst: NodeCompiler,
     source: CompileDocArgs,
-) {
+): Promise<string> {
     const docRes = $typst.compile(source);
     if (!docRes.result) {
         const diags = $typst.fetchDiagnostics(docRes.takeDiagnostics()!);
         console.error(diags);
-        return { svg: "" };
+        return "";
     }
     const doc = docRes.result;
     const svg = $typst.svg(doc);
-    return { svg };
+    return svg;
 }
 
 export async function renderToVectorFormat(
@@ -85,5 +102,19 @@ export async function renderToVectorFormat(
     source = prepareSource(source, options);
     const $typst = getOrInitCompiler();
     const vector = $typst.vector(source);
-    return vector;
+    return { vector };
+}
+
+export async function renderToDynamicLayout(
+    source: TypstDocInput,
+    options: any,
+) {
+    // inputs: { 'x-target': 'web' },
+    if (!options["x-target"]) {
+        options["x-target"] = "web";
+    }
+    source = prepareSource(source, options);
+    const $dyn = getOrInitDynCompiler();
+    const res = $dyn.vector(source);
+    return res;
 }

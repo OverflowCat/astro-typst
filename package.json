@@ -15,7 +15,7 @@
     "astro-component",
     "withastro"
   ],
-  "version": "0.4.0",
+  "version": "0.5.0",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "author": {
@@ -43,13 +43,13 @@
     "@myriaddreamin/typst-ts-renderer": "0.5.0-rc6",
     "@myriaddreamin/typst.ts": "0.5.0-rc6",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "astro": "^4.13",
+    "astro": "^4.15.3",
     "cheerio": "1.0.0-rc.12",
-    "vite": "^5.3"
+    "vite": "^5.4.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9",
-    "@types/node": "^22",
-    "typescript": "^5.5"
+    "@astrojs/check": "^0.9.3",
+    "@types/node": "^22.5.4",
+    "typescript": "^5.5.4"
   }
 }

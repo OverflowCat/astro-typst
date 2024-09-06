@@ -1,6 +1,16 @@
-/*
-
-*/
+#let desc = [$oo$ fun with `math`]
+#metadata(
+  (
+    title: "Test page",
+    author: "Neko",
+    desc: desc,
+    date:  datetime(
+      year: 2024,
+      month: 8,
+      day: 7,
+    ),
+  )
+)<frontmatter>
 
 #set text(lang: "zh", font: "Noto Sans CJK SC")
 #set par(leading: 1em)
@@ -10,7 +20,7 @@
 
 === Include other files
 
-#include "_included.typ"
+#include "../../pages/_included.typ"
 
 #let astro = image.decode("
 <svg width='460' height='160' viewBox='0 0 460 160' fill='none' xmlns='http://www.w3.org/2000/svg'>

@@ -1,10 +1,10 @@
 ---
-import Typst from "../components/Responsive.astro";
+import Typst from "../components/Typst.astro";
 import { TypstDocInput } from "../lib/typst.js";
 import Simp from "./simp.typ";
 
 const code = `
-#set page(width: 12em)
+#set page(width: 15em, height: auto, margin: 1em)
 #let a = 123
 #let b = 456
 #(str(a) + str(b)) Astro Typst Hello World

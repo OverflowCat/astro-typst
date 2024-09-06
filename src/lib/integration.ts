@@ -1,6 +1,7 @@
 import type { AstroIntegration, AstroRenderer, ContentEntryType, HookParameters } from "astro";
 import vitePluginTypst from "./vite.js"
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { renderToSVGString } from "./typst.js";
 
 const PACKAGE_NAME = 'astro-typst'
 const isDebug = true;
@@ -26,9 +27,39 @@ const typstIntegration: AstroIntegration = {
     name: 'typst',
     hooks: {
         "astro:config:setup": (options) => {
-            const { addRenderer, addPageExtension, updateConfig } = (options as SetupHookParams);
+            const { addRenderer, addContentEntryType, addPageExtension, updateConfig } = (options as SetupHookParams);
             addRenderer(getRenderer());
             addPageExtension('.typ');
+            addContentEntryType({
+                extensions: ['.typ'],
+                async getEntryInfo({ fileUrl, contents }) {
+                    const mainFilePath = fileUrl.toString().replace(/^file:\/\/\//, '');
+                    let { frontmatter } = await renderToSVGString(
+                        {
+                            mainFilePath
+                        },
+                        {
+                        });
+                    return {
+                        data: frontmatter(),
+                        body: contents,
+                        // @ts-ignore
+                        slug: frontmatter()?.slug as any,
+                        rawData: contents,
+                    };
+                },
+                // Typ cannot import scripts and styles
+                handlePropagation: false,
+                contentModuleTypes: `
+declare module 'astro:content' {
+  interface Render {
+    '.typ': Promise<{
+      Content: import('astro').MarkdownInstance<{}>['Content'];
+    }>;
+  }
+}
+`
+            });
             updateConfig({
                 vite: {
                     build: {

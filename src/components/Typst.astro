@@ -47,7 +47,7 @@ let input: TypstDocInput =
           ? options.code
           : options.input;
 
-const svg = await renderToSVGString(input, options);
+const { svg } = await renderToSVGString(input, options);
 ---
 
 <div set:html={svg} />

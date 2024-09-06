@@ -14,6 +14,7 @@ An Astro Integration that lets you render Typst within Astro.
 - [x] Static SVGs without JavaScript
 - [ ] Responsive SVGs
 - [ ] Add font files or blobs
+- [x] [Content collections](https://docs.astro.build/en/guides/content-collections/)
 
 ## Installation
 
@@ -104,6 +105,63 @@ y = C x = mat(delim: "[", 0, 0, dots.h.c, 1) x
 ---
 
 <Typst code={code} />
+```
+
+### In content collections
+
+See [demo](/src/content/).
+
+#### Frontmatter
+
+> [`metadata`](https://typst.app/docs/reference/introspection/metadata/) exposes a value to the query system without producing visible content.
+
+Attach a label `frontmatter` to the metadata declaration:
+
+```typ
+#let desc = [$oo$ fun with `math`]
+#metadata(
+  (
+    title: "Test page",
+    author: "Neko",
+    desc: desc,
+    date:  datetime(
+      year: 2024,
+      month: 8,
+      day: 7,
+    ),
+  )
+)<frontmatter>
+```
+
+yields
+
+```json
+{
+  "title": "Test page",
+  "author": "Neko",
+  "desc": {
+    "children": [
+      {
+        "block": false,
+        "body": {
+          "func": "text",
+          "text": "∞"
+        },
+        "func": "equation"
+      },
+      { "func": "space" },
+      { "func": "text", "text": "fun with" },
+      { "func": "space" },
+      {
+        "block": false,
+        "func": "raw",
+        "text": "math"
+      }
+    ],
+    "func": "sequence"
+  },
+  "date": "datetime(year: 2024, month: 8, day: 7)"
+}
 ```
 
 ## Development

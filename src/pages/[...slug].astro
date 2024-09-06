@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import type { InferGetStaticParamsType, InferGetStaticPropsType, GetStaticPaths } from 'astro';
+type Params = InferGetStaticParamsType<typeof getStaticPaths>;
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+export const getStaticPaths = (async () => {
+    const entries = await getCollection("typ");
+    return entries.map((entry: { slug: string }) => ({
+        params: {
+            slug: entry.slug,
+        },
+        props: {entry},
+    }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props as Props;
+const data = entry.data;
+console.log("frontmatter", JSON.stringify(data, null, 2));
+const content = await entry.render();
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+<head>
+    <title>{entry.data.title}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+    <h1>{entry.data.title}</h1>
+    <content.Content />
+</body>
+</html>
