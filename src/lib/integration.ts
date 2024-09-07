@@ -2,6 +2,7 @@ import type { AstroIntegration, AstroRenderer, ContentEntryType, HookParameters 
 import vitePluginTypst from "./vite.js"
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { renderToSVGString } from "./typst.js";
+import { fileURLToPath } from "url";
 
 const PACKAGE_NAME = 'astro-typst'
 const isDebug = true;
@@ -23,34 +24,40 @@ type SetupHookParams = HookParameters<'astro:config:setup'> & {
     addContentEntryType: (contentEntryType: ContentEntryType) => void;
 };
 
-const typstIntegration: AstroIntegration = {
-    name: 'typst',
-    hooks: {
-        "astro:config:setup": (options) => {
-            const { addRenderer, addContentEntryType, addPageExtension, updateConfig } = (options as SetupHookParams);
-            addRenderer(getRenderer());
-            addPageExtension('.typ');
-            addContentEntryType({
-                extensions: ['.typ'],
-                async getEntryInfo({ fileUrl, contents }) {
-                    const mainFilePath = fileUrl.toString().replace(/^file:\/\/\//, '');
-                    let { frontmatter } = await renderToSVGString(
-                        {
-                            mainFilePath
-                        },
-                        {
-                        });
-                    return {
-                        data: frontmatter(),
-                        body: contents,
-                        // @ts-ignore
-                        slug: frontmatter()?.slug as any,
-                        rawData: contents,
-                    };
-                },
-                // Typ cannot import scripts and styles
-                handlePropagation: false,
-                contentModuleTypes: `
+export default function typstIntegration(
+    config = {
+        options: {
+            remPx: 16
+        }
+    }
+): AstroIntegration {
+    return {
+        name: 'typst',
+        hooks: {
+            "astro:config:setup": (options) => {
+                const { addRenderer, addContentEntryType, addPageExtension, updateConfig } = (options as SetupHookParams);
+                addRenderer(getRenderer());
+                addPageExtension('.typ');
+                addContentEntryType({
+                    extensions: ['.typ'],
+                    async getEntryInfo({ fileUrl, contents }) {
+                        const mainFilePath = fileURLToPath(fileUrl);
+                        let { frontmatter } = await renderToSVGString(
+                            {
+                                mainFilePath
+                            },
+                            config?.options);
+                        return {
+                            data: frontmatter(),
+                            body: contents,
+                            // @ts-ignore
+                            slug: frontmatter()?.slug as any,
+                            rawData: contents,
+                        };
+                    },
+                    // Typ cannot import scripts and styles
+                    handlePropagation: false,
+                    contentModuleTypes: `
 declare module 'astro:content' {
   interface Render {
     '.typ': Promise<{
@@ -59,22 +66,21 @@ declare module 'astro:content' {
   }
 }
 `
-            });
-            updateConfig({
-                vite: {
-                    build: {
-                        rollupOptions: {
-                            external: ["@myriaddreamin/typst-ts-node-compiler"]
-                        }
+                });
+                updateConfig({
+                    vite: {
+                        build: {
+                            rollupOptions: {
+                                external: ["@myriaddreamin/typst-ts-node-compiler"]
+                            }
+                        },
+                        plugins: [nodeResolve(), vitePluginTypst(config)],
                     },
-                    plugins: [nodeResolve(), vitePluginTypst()],
-                },
-            });
-        },
-        // "astro:config:done": (options) => {
-        //     console.log(options.config.vite)
-        // }
+                });
+            },
+            // "astro:config:done": (options) => {
+            //     console.log(options.config.vite)
+            // }
+        }
     }
 }
-
-export default () => typstIntegration;

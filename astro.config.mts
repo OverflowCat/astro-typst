@@ -3,5 +3,9 @@ import typst from "./src/lib/integration.js";
 
 // https://astro.build/config
 export default defineConfig({
-    integrations: [typst()], 
+    integrations: [typst({
+        options: {
+            remPx: 14
+        }
+    })],
 });

@@ -11,7 +11,7 @@ export type TypstComponent = {
     svg: string;
 }
 
-export default function () {
+export default function (config: Record<string, any> = {}): Plugin {
     let server: ViteDevServer;
     const plugin: Plugin = {
         name: 'vite-plugin-typ',
@@ -37,8 +37,8 @@ export default function () {
                     {
                         mainFilePath: id
                     },
-                    {
-                    });
+                    config.options
+                );
                 const fileId = id.split('?')[0];
                 const runtime = normalizePath(
                     fileURLToPath(new URL('../../node_modules/astro/dist/runtime/server/index.js', import.meta.url)),

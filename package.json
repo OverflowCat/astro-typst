@@ -15,7 +15,7 @@
     "astro-component",
     "withastro"
   ],
-  "version": "0.5.0",
+  "version": "0.5.2",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "author": {
