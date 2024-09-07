@@ -1,7 +1,6 @@
 import { type Plugin, type ViteDevServer } from "vite";
 import { renderToSVGString } from "./typst.js";
 import fs from "fs/promises";
-import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import { normalizePath } from 'vite';
 import { fileURLToPath, pathToFileURL } from "node:url";
 
