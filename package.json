@@ -15,7 +15,7 @@
     "astro-component",
     "withastro"
   ],
-  "version": "0.5.2",
+  "version": "0.5.6",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "author": {
@@ -50,6 +50,9 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.3",
     "@types/node": "^22.5.4",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.2"
+  },
+  "peerDependencies": {
+    "astro": ">= 3.0.0"
   }
 }

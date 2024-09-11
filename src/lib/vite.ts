@@ -1,8 +1,7 @@
 import { type Plugin, type ViteDevServer } from "vite";
 import { renderToSVGString } from "./typst.js";
 import fs from "fs/promises";
-import { normalizePath } from 'vite';
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 
 export type TypstComponent = {
     name: "TypstComponent";
@@ -40,12 +39,10 @@ export default function (config: Record<string, any> = {}): Plugin {
                     config.options
                 );
                 const fileId = id.split('?')[0];
-                const runtime = normalizePath(
-                    fileURLToPath(new URL('../../node_modules/astro/dist/runtime/server/index.js', import.meta.url)),
-                );
+                // const runtime = "astro/runtime/server/index.js";
                 return {
                     code: `
-import { createComponent, render, renderComponent, unescapeHTML } from ${JSON.stringify(runtime)};
+import { createComponent, render, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
 export const name = "TypstComponent";
 export const svg = ${JSON.stringify(svg)};
 export const frontmatter = ${JSON.stringify(frontmatter())};

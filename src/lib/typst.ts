@@ -77,6 +77,7 @@ export async function renderToSVGString(source: TypstDocInput, options: any) {
             $("svg").attr(key, value as any);
         }
     }
+    // @ts-ignore
     return { svg: $.html(), frontmatter: () => getFrontmatter($typst, source) };
 }
 

@@ -169,6 +169,8 @@ yields
 ### Playground
 
 ```bash
+pnpm tsc -w
+# in another terminal
 pnpm dev
 ```
 

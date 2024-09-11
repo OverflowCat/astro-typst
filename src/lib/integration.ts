@@ -4,14 +4,15 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { renderToSVGString } from "./typst.js";
 import { fileURLToPath } from "url";
 
-const PACKAGE_NAME = 'astro-typst'
-const isDebug = true;
-const root = isDebug ? "" : "astro-typst/";
+const PACKAGE_NAME = 'astro-typst';
+const isDebug = false;
 
 function getRenderer(): AstroRenderer {
+    // const serverEntrypoint = fileURLToPath(new URL('../renderer/index.js', import.meta.url));
+    const serverEntrypoint = (isDebug ? "" : "astro-typst/") + "src/renderer/index.js";
     return {
         name: PACKAGE_NAME,
-        serverEntrypoint: root + 'src/renderer/index.js',
+        serverEntrypoint,
     };
 }
 
@@ -71,7 +72,9 @@ declare module 'astro:content' {
                     vite: {
                         build: {
                             rollupOptions: {
-                                external: ["@myriaddreamin/typst-ts-node-compiler"]
+                                external: [
+                                    "@myriaddreamin/typst-ts-node-compiler",
+                                ],
                             }
                         },
                         plugins: [nodeResolve(), vitePluginTypst(config)],
