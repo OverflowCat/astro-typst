@@ -4,6 +4,7 @@
   "compilerOptions": {
     "allowImportingTsExtensions": false,
     "noEmit": false,
+    "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
   },

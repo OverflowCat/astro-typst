@@ -24,7 +24,8 @@ pnpm-debug.log*
 .idea/
 
 *.js
+*.js.map
 *.d.ts
 *.d.ts.map
 
-!/globals.d.ts
+!globals.d.ts
