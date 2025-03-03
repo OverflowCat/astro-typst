@@ -3,6 +3,7 @@ import vitePluginTypst from "./vite.js"
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { renderToSVGString } from "./typst.js";
 import { fileURLToPath } from "url";
+import type { PluginOption } from "vite";
 
 const PACKAGE_NAME = 'astro-typst';
 const isDebug = false;
@@ -77,7 +78,8 @@ declare module 'astro:content' {
                                 ],
                             }
                         },
-                        plugins: [nodeResolve(), vitePluginTypst(config)],
+                        // @ts-ignore
+                        plugins: [nodeResolve(), vitePluginTypst(config) as PluginOption],
                     },
                 });
             },

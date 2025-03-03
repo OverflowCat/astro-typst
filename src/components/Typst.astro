@@ -1,5 +1,9 @@
 ---
-import { renderToSVGString, type TypstDocInput } from "../lib/typst.js";
+import {
+    renderToSVGString,
+    renderToHTML,
+    type TypstDocInput,
+} from "../lib/typst.js";
 
 export type Props = (
     | { code: string }
@@ -37,6 +41,8 @@ export type TypstOptions = {
     remPx?: number;
     /** @default 2 */
     scale?: number;
+    /** @default "svg" */
+    target?: "svg" | "html";
 };
 
 const options = Astro.props;
@@ -47,7 +53,10 @@ let input: TypstDocInput =
           ? options.code
           : options.input;
 
-const { svg } = await renderToSVGString(input, options);
+const html =
+    options.target === "html"
+        ? (await renderToHTML(input, options)).html
+        : (await renderToSVGString(input, options)).svg;
 ---
 
-<div set:html={svg} />
+<div set:html={html} />

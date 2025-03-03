@@ -119,3 +119,24 @@ export async function renderToDynamicLayout(
     const res = $dyn.vector(source);
     return res;
 }
+
+export async function renderToHTML(
+    source: TypstDocInput,
+    options: any,
+) {
+    source = prepareSource(source, options);
+    const $typst = getOrInitCompiler();
+    const docRes = $typst.compileHtml(source);
+    if (!docRes.result) {
+        const diags = $typst.fetchDiagnostics(docRes.takeDiagnostics()!);
+        console.error(diags);
+        return { html: "" };
+    }
+    const doc = docRes.result;
+    const html = $typst.html(doc);
+    if (!html) {
+        console.error("No HTML generated");
+        return { html: "" };
+    }
+    return { html };
+}

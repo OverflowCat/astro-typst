@@ -4,14 +4,18 @@ import { TypstDocInput } from "../lib/typst.js";
 import Simp from "./simp.typ";
 
 const code = `
-#set page(width: 15em, height: auto, margin: 1em)
+// #set page(width: 15em, height: auto, margin: 1em)
 #let a = 123
 #let b = 456
+this is *html* content
+#html.frame(block(width: 20em)[
+this is *html.frame* content
+
 #(str(a) + str(b)) Astro Typst Hello World
 从军征遐路，讨彼东南夷。方舟顺广川，薄暮未安坻。白日半西山，桑梓有馀晖。蟋蟀夹岸鸣，孤鸟翩翩飞。征夫心多怀，凄凄令吾悲。下船登高防，草露沾我衣。回身赴床寝，此愁当告谁。身服干戈事，岂得念所私。即戎有授命，兹理不可违。
 $oo$ $display(lim_(x → 0))$
-$ cal(A) :=
-    { x in RR | x "is natural" } $
+])
+$ cal(A) := { x in RR | x "is natural" } $
 `;
 const input: TypstDocInput = {
 	mainFilePath: "src/pages/test.typ",
@@ -30,7 +34,7 @@ const input: TypstDocInput = {
 		<h1><samp>astro-typst</samp> component playground</h1>
 		<main>
 			<h2>1: string code</h2>
-			<Typst code={code} />
+			<Typst code={code} target="html" />
 			<h3>
 				<code>width</code> set to <samp>"100%"</samp> and <code
 					>height</code
