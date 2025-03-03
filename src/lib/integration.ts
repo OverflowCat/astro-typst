@@ -6,7 +6,11 @@ import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
 
 const PACKAGE_NAME = 'astro-typst';
-const isDebug = false;
+/**
+ * Change this to `true` if you want to run the code.
+ * Change it to `false` before publishing.
+ */
+const isDebug = true;
 
 function getRenderer(): AstroRenderer {
     // const serverEntrypoint = fileURLToPath(new URL('../renderer/index.js', import.meta.url));

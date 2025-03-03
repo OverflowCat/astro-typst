@@ -12,6 +12,7 @@ An Astro Integration that lets you render Typst within Astro.
 - [x] Selectable, clickable text layer
 - [x] Set scale
 - [x] Static SVGs without JavaScript
+- [x] Static HTML output without JavaScript
 - [ ] Responsive SVGs
 - [ ] Add font files or blobs
 - [x] [Content collections](https://docs.astro.build/en/guides/content-collections/)
@@ -105,6 +106,10 @@ y = C x = mat(delim: "[", 0, 0, dots.h.c, 1) x
 ---
 
 <Typst code={code} />
+
+<!-- or HTML output: -->
+
+<Typst code={code} target="html" />
 ```
 
 ### In content collections
@@ -167,6 +172,8 @@ yields
 ## Development
 
 ### Playground
+
+Change `isDebug` to `true` in <samp>integration.ts</samp>.
 
 ```bash
 pnpm tsc -w
