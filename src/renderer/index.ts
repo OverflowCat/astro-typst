@@ -12,7 +12,7 @@ async function check(
 }
 
 async function renderToStaticMarkup(t: TypstComponent, attrs: {}) {
-    return { attrs, html: t.svg }
+    return { attrs, html: t.html };
 }
 
 const renderer: NamedSSRLoadedRendererValue = {

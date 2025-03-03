@@ -2,6 +2,7 @@
 import Typst from "../components/Typst.astro";
 import { TypstDocInput } from "../lib/typst.js";
 import Simp from "./simp.typ";
+import SimpHtml from "./simp-html.typ?html";
 
 const code = `
 // #set page(width: 15em, height: auto, margin: 1em)
@@ -18,7 +19,7 @@ $oo$ $display(lim_(x → 0))$
 $ cal(A) := { x in RR | x "is natural" } $
 `;
 const input: TypstDocInput = {
-	mainFilePath: "src/pages/test.typ",
+	mainFilePath: "src/content/typ/test.typ",
 };
 ---
 
@@ -36,17 +37,18 @@ const input: TypstDocInput = {
 			<h2>1: string code</h2>
 			<Typst code={code} target="html" />
 			<h3>
-				<code>width</code> set to <samp>"100%"</samp> and <code
-					>height</code
+				<code>width</code> set to <samp>"100%"</samp> and <code>height</code
 				> set to <samp>"auto"</samp>
 			</h3>
 			<!-- <Typst code={code} width={"100%"} height={"auto"} /> -->
-			<h2>2: <code>TypstDocInput</code></h2>
-			<!-- <Typst input={input} /> -->
-			<h2>3: <code>mainFilePath</code></h2>
-			<!-- <Typst src={input.mainFilePath!} /> -->
-			<h2>4: <samp>simp.typ</samp></h2>
+			<h2>2: <samp>simp.typ</samp></h2>
 			<Simp />
+			<h2>3: <samp>simp.typ html</samp></h2>
+			<SimpHtml />
+			<h2>4: <code>TypstDocInput</code></h2>
+			<Typst input={input} />
+			<h2>5: <code>mainFilePath</code></h2>
+			<Typst src={input.mainFilePath!} />
 		</main>
 	</body>
 </html>
