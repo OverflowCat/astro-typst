@@ -1,5 +1,7 @@
 # `astro-typst`
 
+<a href='https://typst.app/' target="_blank"><img alt='Supported Typst version: 0.13' src='https://img.shields.io/badge/Typst_0.13-100000?style=for-the-badge&logo=Typst&logoColor=30bdc1&labelColor=FFFFFF&color=EAFEFF' />
+
 An Astro Integration that lets you render Typst within Astro.
 
 <img src="https://github.com/user-attachments/assets/613eaf8e-53da-4cf0-bbaa-f32592d7f742" alt="Demo" width="400" />
@@ -43,6 +45,22 @@ export default defineConfig({
 ```
 
 Then you can use `.typ` files just like anything else in Astro: render directly by router, or import in another file.
+
+Example:
+
+```mdx
+import Paper from "./_test.typ";
+
+<Paper />
+```
+
+Experimental HTML output:
+
+```mdx
+import Paper from "./_test.typ?html";
+
+<Paper />
+```
 
 ### As a component
 
