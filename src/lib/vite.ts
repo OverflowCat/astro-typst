@@ -15,14 +15,23 @@ export default function (config: Record<string, any> = {}): Plugin {
     const plugin: Plugin = {
         name: 'vite-plugin-typ',
         configureServer(_server) {
-            // _server.watcher.on('change', (event) => console.log({ event }));
             server = _server;
-        },
-        handleHotUpdate({ modules }) {
-            for (const mod of modules) {
-                server.moduleGraph.invalidateModule(mod);
-            }
-            // console.log(server.moduleGraph.fileToModulesMap)
+            // listen for .typ file changes
+            server.watcher.on('change', async (filePath) => {
+                if (filePath.endsWith('.typ')) {
+                    console.debug(`[vite-plugin-astro-typ] File changed: ${filePath}`);
+                    const modules = server.moduleGraph.getModulesByFile(filePath);
+                    if (modules) {
+                        for (const mod of modules) {
+                            server.moduleGraph.invalidateModule(mod);
+                        }
+                    }
+                    server.ws.send({
+                        type: 'full-reload',
+                        path: '*', // 触发全页面刷新
+                    });
+                }
+            });
         },
         async transform(code: string, id: string) {
             id.includes('.typ') && console.debug({ id });
