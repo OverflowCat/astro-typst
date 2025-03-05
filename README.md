@@ -1,6 +1,7 @@
 # `astro-typst`
 
-<a href='https://typst.app/' target="_blank"><img alt='Supported Typst version: 0.13' src='https://img.shields.io/badge/Typst_0.13-100000?style=for-the-badge&logo=Typst&logoColor=30bdc1&labelColor=FFFFFF&color=EAFEFF' />
+![NPM Version](https://img.shields.io/npm/v/astro-typst?style=for-the-badge)
+<a href='https://typst.app/' target="_blank"><img alt='Supported Typst version: 0.13' src='https://img.shields.io/badge/Typst_0.13-100000?style=for-the-badge&logo=Typst&logoColor=30bdc1&labelColor=FFFFFF&color=30BDB2' />
 
 An Astro Integration that lets you render Typst within Astro.
 
@@ -15,9 +16,12 @@ An Astro Integration that lets you render Typst within Astro.
 - [x] Set scale
 - [x] Static SVGs without JavaScript
 - [x] Static HTML output without JavaScript
+- [x] [Content collections](https://docs.astro.build/en/guides/content-collections/)
+- [x] Write frontmatter directly in `.typ`
+- [ ] Pass data from JS to typst
+- [ ] Pass data from typst to JS
 - [ ] Responsive SVGs
 - [ ] Add font files or blobs
-- [x] [Content collections](https://docs.astro.build/en/guides/content-collections/)
 
 ## Installation
 
