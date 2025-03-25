@@ -18,6 +18,10 @@
 
 == `astro-typst` playground
 
+=== Link
+
+Look at @rainbow!
+
 === Include other files
 
 #include "../../pages/_included.typ"
@@ -57,12 +61,15 @@ $
 $ f(t, z) CONV h(t, z) = INTOO INTOO f(alpha, beta) h(t - alpha, z - beta) dif alpha dif beta. $
 
 #set image(height: 2em)
-#stack(dir: ltr, )[Hello from][astro]
+#stack(dir: ltr, )[Hello from ][astro]
 #set square(size: 4cm)
-#stack(
-  dir: ltr,
-  spacing: 1fr,
-  square(fill: gradient.linear(..color.map.rainbow)),
-  square(fill: gradient.radial(..color.map.rainbow)),
-  square(fill: gradient.conic(..color.map.rainbow)),
-)
+#figure(
+  caption: "Rainbow squares",
+  stack(
+    dir: ltr,
+    spacing: 1fr,
+    square(fill: gradient.linear(..color.map.rainbow)),
+    square(fill: gradient.radial(..color.map.rainbow)),
+    square(fill: gradient.conic(..color.map.rainbow)),
+  ),
+)<rainbow>
