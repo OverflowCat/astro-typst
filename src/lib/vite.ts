@@ -2,15 +2,9 @@ import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTML, renderToSVGString } from "./typst.js";
 import fs from "fs/promises";
 import { pathToFileURL } from "node:url";
+import type { AstroTypstConfig } from "./prelude.js";
 
-export type TypstComponent = {
-    name: "TypstComponent";
-    frontmatter: Record<string, any>;
-    file: string;
-    html: string;
-}
-
-export default function (config: Record<string, any> = {}): Plugin {
+export default function (config: AstroTypstConfig = {}): Plugin {
     let server: ViteDevServer;
     const plugin: Plugin = {
         name: 'vite-plugin-typ',

@@ -1,10 +1,6 @@
 import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler/index.js";
 import { load } from "cheerio";
-
-/**
- * Either a string or an object for multiple files.
-*/
-export type TypstDocInput = CompileDocArgs | string;
+import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
 
 let compilerIns: NodeCompiler | undefined;
 let dynCompilerIns: DynLayoutCompiler | undefined;
@@ -47,14 +43,14 @@ export function getFrontmatter($typst: NodeCompiler, source: CompileDocArgs) {
  * @param options Options for rendering the SVG.
  * @returns The SVG string.
  */
-export async function renderToSVGString(source: TypstDocInput, options: any) {
+export async function renderToSVGString(source: TypstDocInput, options: AstroTypstRenderOption) {
     source = prepareSource(source, options);
     const $typst = getOrInitCompiler();
     const svg = await renderToSVGString_($typst, source);
     $typst.evictCache(10);
-    const $ = load(svg);
+    let $ = load(svg);
+    (options?.cheerio?.preprocess) && ($ = options?.cheerio?.preprocess($, source));
     const remPx = options.remPx || 16;
-
     const width = $("svg").attr("width");
     if (options.width === undefined && width !== undefined) {
         const remWidth = parseFloat(width) * 2 / remPx;
@@ -78,8 +74,10 @@ export async function renderToSVGString(source: TypstDocInput, options: any) {
             $("svg").attr(key, value as any);
         }
     }
+    (options.cheerio?.postprocess) && ($ = options?.cheerio?.postprocess($, source));
+    const svgString = options.cheerio?.stringify ? options.cheerio.stringify($, source) : $.html();
     // @ts-ignore
-    return { svg: $.html(), frontmatter: () => getFrontmatter($typst, source) };
+    return { svg: svgString, frontmatter: () => getFrontmatter($typst, source) };
 }
 
 async function renderToSVGString_(
