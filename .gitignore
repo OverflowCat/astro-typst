@@ -28,4 +28,6 @@ pnpm-debug.log*
 *.d.ts
 *.d.ts.map
 
+**/test*.*
+
 !globals.d.ts

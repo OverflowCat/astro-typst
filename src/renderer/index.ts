@@ -1,5 +1,5 @@
 import type { NamedSSRLoadedRendererValue } from "astro";
-import type { TypstComponent } from "../lib/vite.js";
+import type { TypstComponent } from "../lib/prelude";
 
 async function check(
     t: any,

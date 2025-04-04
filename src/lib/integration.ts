@@ -4,6 +4,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { renderToSVGString } from "./typst.js";
 import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
+import { createResolver, defineIntegration, watchDirectory } from "astro-integration-kit";
 
 const PACKAGE_NAME = 'astro-typst';
 /**
@@ -30,6 +31,8 @@ type SetupHookParams = HookParameters<'astro:config:setup'> & {
     addContentEntryType: (contentEntryType: ContentEntryType) => void;
 };
 
+const { resolve: resolver } = createResolver(import.meta.url);
+
 export default function typstIntegration(
     config = {
         options: {
@@ -42,6 +45,7 @@ export default function typstIntegration(
         hooks: {
             "astro:config:setup": (options) => {
                 const { addRenderer, addContentEntryType, addPageExtension, updateConfig } = (options as SetupHookParams);
+                watchDirectory(options, resolver());
                 addRenderer(getRenderer());
                 addPageExtension('.typ');
                 addContentEntryType({
