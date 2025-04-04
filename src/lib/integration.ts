@@ -11,7 +11,7 @@ const PACKAGE_NAME = 'astro-typst';
  * Change this to `true` if you want to run the code.
  * Change it to `false` before publishing.
  */
-const isDebug = false;
+import { isDebug } from "./debug.js";
 
 function getRenderer(): AstroRenderer {
     // const serverEntrypoint = fileURLToPath(new URL('../renderer/index.js', import.meta.url));
@@ -91,9 +91,18 @@ declare module 'astro:content' {
                     },
                 });
             },
-            // "astro:config:done": (options) => {
-            //     console.log(options.config.vite)
-            // }
+
+            "astro:config:done": (params) => {
+                params.injectTypes(
+                    {
+                        filename: "astro-i18n.d.ts",
+                        content: `declare module '*.typ' {
+    const component: () => any;
+    export default component;
+}`,
+                    }
+                )
+            }
         }
     }
 }

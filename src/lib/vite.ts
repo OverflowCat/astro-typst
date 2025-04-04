@@ -1,4 +1,4 @@
-import { type Plugin, type ResolvedConfig, type ViteDevServer } from "vite";
+import { type HmrContext, type Plugin, type ResolvedConfig, type ViteDevServer } from "vite";
 import { renderToHTML, renderToSVGString } from "./typst.js";
 import fs from "fs/promises";
 import { pathToFileURL } from "node:url";
@@ -29,20 +29,55 @@ export default function (config: AstroTypstConfig = {}): Plugin {
         name: 'vite-plugin-astro-typ',
         enforce: 'pre',
 
-
-        // resolveId(id) {
-        //     if (!id.includes("typ")) return null;
-        //     const moduleInfo = this.getModuleInfo(id);
-        //     if (!moduleInfo) return null;
-        //     debug(`[vite-plugin-astro-typ] Resolving id: ${id}`, { moduleInfo: moduleInfo?.meta?.astro });
+        // resolveId(source, importer, options) {
+        //     if (!isTypstFile(source)) return null;
+        //     const { path, opts } = extractOpts(source);
+        //     console.log(`'${path}' is imported by '${importer}'`);
         // },
 
         load(id) {
             if (!isTypstFile(id)) return;
             debug(`[vite-plugin-astro-typ] Loading id: ${id}`);
             const { path, opts } = extractOpts(id);
-            this.addWatchFile(path);
+            // this.addWatchFile(path);
         },
+
+        // handleHotUpdate(ctx: HmrContext) {
+        //     // ctx.file: 发生变化的文件路径
+        //     // ctx.modules: 受影响的 ModuleNode 数组
+        //     if (!isTypstFile(ctx.file)) return;
+        //     console.log(`File changed: ${ctx.file}`);
+        //     // const importersToUpdate = new Set<any>(); // Use a Set to avoid duplicates
+        //     ctx.modules.forEach((moduleNode: any) => {
+        //         console.log(`  Module affected: ${moduleNode.id || moduleNode.file}`);
+        //         if (moduleNode.importers.size > 0) {
+        //             console.log(`    Imported by:`);
+        //             // @ts-ignore
+        //             moduleNode.importers.forEach((importerNode) => {
+        //                 console.log(`     - ${importerNode.id || importerNode.file}`);
+        //                 // importersToUpdate.add(importerNode);
+        //                 server.moduleGraph.invalidateModule(importerNode);
+        //                 console.log(`    Invalidating module: ${importerNode.id || importerNode.file}`);
+        //             });
+        //         } else {
+        //             console.log(`    Not imported by any other loaded module.`);
+        //         }
+        //     });
+            
+            // 返回需要 HMR 的模块，或空数组执行自定义处理/全页面重载
+            // @ts-ignore
+/*             if (importersToUpdate.size > 0) {
+                for (const importer of importersToUpdate) {
+                    // const module = server.moduleGraph.getModuleById(importer.id || importer.file);
+                    // if (module) server.moduleGraph.invalidateModule(module);
+                    // else console.log(`  No module found for importer: ${importer.id || importer.file}`);
+                }
+                console.log(`  Importers to update: ${Array.from(importersToUpdate).map((m) => m.id || m.file).join(', ')}`);
+                return Array.from(importersToUpdate);
+            } */
+        //     ctx.server.hot.send({ type: 'full-reload' });
+        //     return [];
+        // },
 
         configureServer(_server) {
             server = _server;
@@ -68,9 +103,7 @@ export default function (config: AstroTypstConfig = {}): Plugin {
 
         async transform(code: string, id: string) {
             if (!isTypstFile(id)) return;
-            debug(`[vite-plugin-astro-typ] Transforming id: ${id}`);
             const { path, opts } = extractOpts(id);
-            debug({ path, opts });
             await new Promise((resolve) => setTimeout(resolve, 1000));
             const isHtml = opts.includes('html');
 
@@ -93,9 +126,6 @@ export default function (config: AstroTypstConfig = {}): Plugin {
                 html = svg;
                 getFrontmatter = frontmatter;
             }
-            debug({
-                path
-            })
             return {
                 code: `
 import { createComponent, render, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";

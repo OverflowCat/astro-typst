@@ -12,10 +12,15 @@ function prepareSource(source: TypstDocInput, _options: any) {
     return source;
 }
 
-function getOrInitCompiler(): NodeCompiler {
-    return (compilerIns ||= NodeCompiler.create({
+function initCompiler(): NodeCompiler {
+    return NodeCompiler.create({
         workspace: "./", // default
-    }));
+    });
+}
+
+
+function getOrInitCompiler(): NodeCompiler {
+    return (compilerIns ||= initCompiler());
 }
 
 function getOrInitDynCompiler(): DynLayoutCompiler {
@@ -45,9 +50,9 @@ export function getFrontmatter($typst: NodeCompiler, source: CompileDocArgs) {
  */
 export async function renderToSVGString(source: TypstDocInput, options: AstroTypstRenderOption) {
     source = prepareSource(source, options);
-    const $typst = getOrInitCompiler();
+    const $typst = source.mainFileContent? getOrInitCompiler() : initCompiler();
     const svg = await renderToSVGString_($typst, source);
-    $typst.evictCache(10);
+    $typst.evictCache(60);
     let $ = load(svg);
     (options?.cheerio?.preprocess) && ($ = options?.cheerio?.preprocess($, source));
     const remPx = options.remPx || 16;

@@ -13,3 +13,5 @@
 #repeat(10, render)
 
 $ oo $
+
+#include "_included.typ"
