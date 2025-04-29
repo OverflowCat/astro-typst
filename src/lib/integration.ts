@@ -11,11 +11,13 @@ const PACKAGE_NAME = 'astro-typst';
  * Change this to `true` if you want to run the code.
  * Change it to `false` before publishing.
  */
-import { isDebug } from "./debug.js";
-
 function getRenderer(): AstroRenderer {
     // const serverEntrypoint = fileURLToPath(new URL('../renderer/index.js', import.meta.url));
+    const isDebug = !!process.env.ASTRO_TYPST;
     const serverEntrypoint = (isDebug ? "" : "astro-typst/") + "src/renderer/index.js";
+    isDebug && console.debug(`\x1b[42mYou are running the demo, not importing the package from elsewhere.\x1b[0m
+\x1b[32mThis mode is good for test, debug, and build the demo site.\x1b[0m
+Server entry point: ${serverEntrypoint}`);
     return {
         name: PACKAGE_NAME,
         serverEntrypoint,

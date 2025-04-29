@@ -15,7 +15,7 @@ export const getStaticPaths = (async () => {
 
 const { entry } = Astro.props as Props;
 const data = entry.data;
-console.log("frontmatter", JSON.stringify(data, null, 2));
+console.log("\nfrontmatter", JSON.stringify(data, null, 2));
 const content = await entry.render();
 ---
 <?xml version="1.0" encoding="UTF-8"?>

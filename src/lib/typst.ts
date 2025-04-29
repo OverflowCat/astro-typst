@@ -39,7 +39,6 @@ export function getFrontmatter($typst: NodeCompiler, source: CompileDocArgs) {
     } catch (error) {
         console.warn("Error querying frontmatter", error);
     }
-    // console.info("Frontmatter", frontmatter);
     return frontmatter;
 }
 

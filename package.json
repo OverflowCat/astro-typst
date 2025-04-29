@@ -32,7 +32,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "tsc && astro check && astro build",
     "compile": "tsc",
     "preview": "astro preview",
     "pub": "pnpm compile && pnpm publish --no-git-checks",

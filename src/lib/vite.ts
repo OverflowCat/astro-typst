@@ -1,4 +1,4 @@
-import { type HmrContext, type Plugin, type ResolvedConfig, type ViteDevServer } from "vite";
+import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTML, renderToSVGString } from "./typst.js";
 import fs from "fs/promises";
 import { pathToFileURL } from "node:url";

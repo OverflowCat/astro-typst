@@ -255,8 +255,6 @@ window.handleTypstLocation = function (elem, page, x, y) {
 
 ### Playground
 
-Change `isDebug` to `true` in <samp>integration.ts</samp>.
-
 ```bash
 pnpm tsc -w
 # in another terminal
