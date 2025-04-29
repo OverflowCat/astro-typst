@@ -1,4 +1,4 @@
-import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler/index.js";
+import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument } from "@myriaddreamin/typst-ts-node-compiler/index.js";
 import { load } from "cheerio";
 import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
 
@@ -29,7 +29,7 @@ function getOrInitDynCompiler(): DynLayoutCompiler {
     ));
 }
 
-export function getFrontmatter($typst: NodeCompiler, source: CompileDocArgs) {
+export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument | CompileDocArgs) {
     var frontmatter: Record<string, any> = {};
     try {
         const data = $typst.query(source, { selector: "<frontmatter>" })
@@ -124,22 +124,25 @@ export async function renderToDynamicLayout(
 }
 
 export async function renderToHTML(
-    source: TypstDocInput,
+    source: TypstDocInput & { body?: boolean },
     options: any,
 ) {
+    const onlyBody = source.body;
     source = prepareSource(source, options);
     const $typst = getOrInitCompiler();
     const docRes = $typst.compileHtml(source);
     if (!docRes.result) {
-        const diags = $typst.fetchDiagnostics(docRes.takeDiagnostics()!);
-        console.error(diags);
+        docRes.printDiagnostics();
         return { html: "" };
     }
     const doc = docRes.result;
-    const html = $typst.html(doc);
-    if (!html) {
-        console.error("No HTML generated");
+    const html = $typst.tryHtml(doc);
+    if (!html.result) {
+        html.printDiagnostics();
         return { html: "" };
     }
-    return { html };
+    return { html: 
+        onlyBody?
+        html.result.body():
+        html.result.html(), frontmatter: () => getFrontmatter($typst, doc) };
 }

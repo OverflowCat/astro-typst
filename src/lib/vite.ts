@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import type { AstroTypstConfig } from "./prelude.js";
 
 function isTypstFile(id: string) {
-    return /\.typ(\?(html|svg))?$/.test(id);
+    return /\.typ(\?(html|svg|html&body|body&html))?$/.test(id);
 }
 function extractOpts(id: string) {
     const q = id.lastIndexOf('?');
@@ -105,6 +105,7 @@ export default function (config: AstroTypstConfig = {}): Plugin {
             if (!isTypstFile(id)) return;
             const { path, opts } = extractOpts(id);
             await new Promise((resolve) => setTimeout(resolve, 1000));
+            const isBody = opts.includes('body');
             const isHtml = opts.includes('html');
 
             var html: string;
@@ -112,19 +113,20 @@ export default function (config: AstroTypstConfig = {}): Plugin {
             if (isHtml) {
                 html = (await renderToHTML(
                     {
-                        mainFilePath: path
+                        mainFilePath: path,
+                        body: isBody,
                     },
                     config.options
                 )).html;
             } else {
-                const { svg, frontmatter } = await renderToSVGString(
+                let { html: htmlRes, frontmatter } = await renderToHTML(
                     {
-                        mainFilePath: path
+                        mainFilePath: path,
+                        body: true,
                     },
-                    config.options ?? {}
-                );
-                html = svg;
-                getFrontmatter = frontmatter;
+                    config?.options ?? {});
+                html = htmlRes;
+                getFrontmatter = frontmatter || (() => ({}));
             }
             return {
                 code: `

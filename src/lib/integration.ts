@@ -1,7 +1,7 @@
 import type { AstroIntegration, AstroRenderer, ContentEntryType, HookParameters } from "astro";
 import vitePluginTypst from "./vite.js"
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { renderToSVGString } from "./typst.js";
+import { renderToSVGString, renderToHTML } from "./typst.js";
 import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
 import { createResolver, defineIntegration, watchDirectory } from "astro-integration-kit";
@@ -54,16 +54,18 @@ export default function typstIntegration(
                     extensions: ['.typ'],
                     async getEntryInfo({ fileUrl, contents }) {
                         const mainFilePath = fileURLToPath(fileUrl);
-                        let { frontmatter } = await renderToSVGString(
+                        let { frontmatter } = await renderToHTML(
                             {
                                 mainFilePath
                             },
                             config?.options);
+
+                        const frontmatterResult = frontmatter?.();
                         return {
-                            data: frontmatter(),
+                            data: frontmatterResult || {},
                             body: contents,
                             // @ts-ignore
-                            slug: frontmatter()?.slug as any,
+                            slug: frontmatterResult?.slug as any,
                             rawData: contents,
                         };
                     },
