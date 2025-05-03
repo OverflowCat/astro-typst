@@ -44,8 +44,36 @@ import { typst } from 'astro-typst';
 ... // other imports
 
 export default defineConfig({
-    integrations: [/** other integrations */ ..., typst()],
+  integrations: [
+    /** other integrations */...,
+    typst({
+      options: {
+        remPx: 14,
+      },
+      mode: {
+        default: "svg",
+        detect: function (id: string): "html" | "svg" {
+          console.debug(`Detecting ${id}`);
+          if (id.endsWith(".html.typ") || id.includes("/html/"))
+            return "html";
+          else if (id.endsWith(".svg.typ") || id.includes("/svg/"))
+            return "svg";
+          return this.default;
+        },
+      },
+    }),
+  ],
 });
+```
+
+The `detect` function determines which mode a file will render in. The default is:
+
+```
+*.html.typ => html export
+ *.svg.typ =>  svg export
+**/html/** => html export
+ **/svg/** =>  svg export
+other => use the value of mode.default
 ```
 
 Then you can use `.typ` files just like anything else in Astro: render directly by router, or import in another file.
@@ -58,10 +86,17 @@ import Paper from "./_test.typ";
 <Paper />
 ```
 
-Experimental HTML output:
+Force HTML output:
 
 ```mdx
 import Paper from "./_test.typ?html";
+
+<Paper />
+```
+
+Force SVG output:
+```mdx
+import Paper from "./_test.typ?svg";
 
 <Paper />
 ```
