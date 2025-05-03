@@ -1,9 +1,7 @@
 ---
-import {
-    renderToSVGString,
-    renderToHTML,
-    type TypstDocInput,
-} from "../lib/typst.js";
+import { renderToSVGString, renderToHTML } from "../lib/typst.js";
+
+import type { TypstDocInput } from "../lib/prelude.js";
 
 export type Props = (
     | { code: string }

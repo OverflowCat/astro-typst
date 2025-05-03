@@ -1,7 +1,7 @@
 #metadata(
   (
-    "title": "文章2",
-    "author": "鱼鱼",
+    "title": "Article 2",
+    "author": "fish",
     desc: [另一篇关于如何使用 `fish` 的文章。],
     date:  datetime(
       year: 2024,

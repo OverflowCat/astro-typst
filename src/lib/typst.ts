@@ -1,4 +1,4 @@
-import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument } from "@myriaddreamin/typst-ts-node-compiler/index.js";
+import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument } from "@myriaddreamin/typst-ts-node-compiler";
 import { load } from "cheerio";
 import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
 
@@ -49,7 +49,7 @@ export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument |
  */
 export async function renderToSVGString(source: TypstDocInput, options: AstroTypstRenderOption) {
     source = prepareSource(source, options);
-    const $typst = source.mainFileContent? getOrInitCompiler() : initCompiler();
+    const $typst = source.mainFileContent ? getOrInitCompiler() : initCompiler();
     const svg = await renderToSVGString_($typst, source);
     $typst.evictCache(60);
     let $ = load(svg);
@@ -132,6 +132,7 @@ export async function renderToHTML(
     const $typst = getOrInitCompiler();
     const docRes = $typst.compileHtml(source);
     if (!docRes.result) {
+        console.trace("Error compiling HTML", docRes.takeDiagnostics());
         docRes.printDiagnostics();
         return { html: "" };
     }
@@ -141,8 +142,39 @@ export async function renderToHTML(
         html.printDiagnostics();
         return { html: "" };
     }
-    return { html: 
-        onlyBody?
-        html.result.body():
-        html.result.html(), frontmatter: () => getFrontmatter($typst, doc) };
+    return {
+        html:
+            onlyBody ?
+                html.result.body() :
+                html.result.html(),
+        frontmatter: () => getFrontmatter($typst, doc),
+    };
+}
+
+
+export async function renderToHTMLish(
+    source: TypstDocInput & { body?: boolean },
+    options: any,
+    isHtml: boolean = true,
+) {
+    var html: string;
+    var getFrontmatter = () => ({});
+    if (isHtml) {
+        let { html: htmlRes, frontmatter } = await renderToHTML(
+            source,
+            options
+        );
+        html = htmlRes;
+        getFrontmatter = frontmatter || (() => ({}));
+    } else /* svg */ {
+        let { svg, frontmatter } = await renderToSVGString(
+            source, options
+        );
+        html = svg;
+        getFrontmatter = frontmatter || (() => ({}));
+    }
+    return {
+        html,
+        getFrontmatter,
+    };
 }

@@ -1,6 +1,6 @@
-import { type Plugin, type ViteDevServer } from "vite";
-import { renderToHTML, renderToSVGString } from "./typst.js";
 import fs from "fs/promises";
+import { type Plugin, type ViteDevServer } from "vite";
+import { renderToHTMLish } from "./typst.js";
 import { pathToFileURL } from "node:url";
 import type { AstroTypstConfig } from "./prelude.js";
 
@@ -23,7 +23,7 @@ function debug(...args: any[]) {
     }
 }
 
-export default function (config: AstroTypstConfig = {}): Plugin {
+export default function (config: AstroTypstConfig): Plugin {
     let server: ViteDevServer;
     const plugin: Plugin = {
         name: 'vite-plugin-astro-typ',
@@ -38,7 +38,7 @@ export default function (config: AstroTypstConfig = {}): Plugin {
         load(id) {
             if (!isTypstFile(id)) return;
             debug(`[vite-plugin-astro-typ] Loading id: ${id}`);
-            const { path, opts } = extractOpts(id);
+            // const { path, opts } = extractOpts(id);
             // this.addWatchFile(path);
         },
 
@@ -63,18 +63,18 @@ export default function (config: AstroTypstConfig = {}): Plugin {
         //             console.log(`    Not imported by any other loaded module.`);
         //         }
         //     });
-            
-            // 返回需要 HMR 的模块，或空数组执行自定义处理/全页面重载
-            // @ts-ignore
-/*             if (importersToUpdate.size > 0) {
-                for (const importer of importersToUpdate) {
-                    // const module = server.moduleGraph.getModuleById(importer.id || importer.file);
-                    // if (module) server.moduleGraph.invalidateModule(module);
-                    // else console.log(`  No module found for importer: ${importer.id || importer.file}`);
-                }
-                console.log(`  Importers to update: ${Array.from(importersToUpdate).map((m) => m.id || m.file).join(', ')}`);
-                return Array.from(importersToUpdate);
-            } */
+
+        // 返回需要 HMR 的模块，或空数组执行自定义处理/全页面重载
+        // @ts-ignore
+        /*             if (importersToUpdate.size > 0) {
+                        for (const importer of importersToUpdate) {
+                            // const module = server.moduleGraph.getModuleById(importer.id || importer.file);
+                            // if (module) server.moduleGraph.invalidateModule(module);
+                            // else console.log(`  No module found for importer: ${importer.id || importer.file}`);
+                        }
+                        console.log(`  Importers to update: ${Array.from(importersToUpdate).map((m) => m.id || m.file).join(', ')}`);
+                        return Array.from(importersToUpdate);
+                    } */
         //     ctx.server.hot.send({ type: 'full-reload' });
         //     return [];
         // },
@@ -105,29 +105,25 @@ export default function (config: AstroTypstConfig = {}): Plugin {
             if (!isTypstFile(id)) return;
             const { path, opts } = extractOpts(id);
             await new Promise((resolve) => setTimeout(resolve, 1000));
+            
             const isBody = opts.includes('body');
-            const isHtml = opts.includes('html');
-
-            var html: string;
-            var getFrontmatter = () => ({});
-            if (isHtml) {
-                html = (await renderToHTML(
-                    {
-                        mainFilePath: path,
-                        body: isBody,
-                    },
-                    config.options
-                )).html;
+            let isHtml = false;
+            if (opts.includes('svg')) {
+                isHtml = false;
+            } else if (opts.includes('html')) {
+                isHtml = true;
             } else {
-                let { html: htmlRes, frontmatter } = await renderToHTML(
-                    {
-                        mainFilePath: path,
-                        body: true,
-                    },
-                    config?.options ?? {});
-                html = htmlRes;
-                getFrontmatter = frontmatter || (() => ({}));
+                isHtml = config.mode.detect(path) === "html";
             }
+
+            const { html, getFrontmatter } = await renderToHTMLish(
+                {
+                    mainFilePath: path,
+                    body: isBody,
+                },
+                config.options,
+                isHtml
+            );
             return {
                 code: `
 import { createComponent, render, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";

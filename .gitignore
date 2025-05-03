@@ -23,6 +23,10 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# version control
+.jj
+
+# project
 *.js
 *.js.map
 *.d.ts

@@ -1,18 +1,15 @@
 import type { AstroIntegration, AstroRenderer, ContentEntryType, HookParameters } from "astro";
 import vitePluginTypst from "./vite.js"
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { renderToSVGString, renderToHTML } from "./typst.js";
+import { renderToHTMLish } from "./typst.js";
 import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
-import { createResolver, defineIntegration, watchDirectory } from "astro-integration-kit";
+import { createResolver, watchDirectory } from "astro-integration-kit";
+import { DefaultMode, type AstroTypstConfig } from "./prelude.js";
 
 const PACKAGE_NAME = 'astro-typst';
-/**
- * Change this to `true` if you want to run the code.
- * Change it to `false` before publishing.
- */
+
 function getRenderer(): AstroRenderer {
-    // const serverEntrypoint = fileURLToPath(new URL('../renderer/index.js', import.meta.url));
     const isDebug = !!process.env.ASTRO_TYPST;
     const serverEntrypoint = (isDebug ? "" : "astro-typst/") + "src/renderer/index.js";
     isDebug && console.debug(`\x1b[42mYou are running the demo of \x1b[33mastro-typst\x1b[42m, not importing the package from elsewhere.\x1b[0m
@@ -36,17 +33,20 @@ type SetupHookParams = HookParameters<'astro:config:setup'> & {
 const { resolve: resolver } = createResolver(import.meta.url);
 
 export default function typstIntegration(
-    config = {
+    config: AstroTypstConfig = {
         options: {
             remPx: 16
-        }
+        },
+        mode: DefaultMode,
     }
 ): AstroIntegration {
     return {
         name: 'typst',
         hooks: {
             "astro:config:setup": (options) => {
-                const { addRenderer, addContentEntryType, addPageExtension, updateConfig } = (options as SetupHookParams);
+                const {
+                    addRenderer, addContentEntryType, addPageExtension, updateConfig
+                } = (options as SetupHookParams);
                 watchDirectory(options, resolver());
                 addRenderer(getRenderer());
                 addPageExtension('.typ');
@@ -54,13 +54,16 @@ export default function typstIntegration(
                     extensions: ['.typ'],
                     async getEntryInfo({ fileUrl, contents }) {
                         const mainFilePath = fileURLToPath(fileUrl);
-                        let { frontmatter } = await renderToHTML(
+                        const isHtml = config.mode.detect(fileUrl.pathname) === "html";
+                        let { getFrontmatter } = await renderToHTMLish(
                             {
-                                mainFilePath
+                                mainFilePath,
+                                body: true,
                             },
-                            config?.options);
-
-                        const frontmatterResult = frontmatter?.();
+                            config?.options,
+                            isHtml
+                        )
+                        const frontmatterResult = getFrontmatter?.();
                         return {
                             data: frontmatterResult || {},
                             body: contents,
