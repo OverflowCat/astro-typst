@@ -42,14 +42,14 @@
     "@myriaddreamin/typst-ts-node-compiler": "0.6.0-rc1",
     "@myriaddreamin/typst-ts-renderer": "0.6.0-rc1",
     "@myriaddreamin/typst.ts": "0.6.0-rc1",
-    "@rollup/plugin-node-resolve": "^15.3.1",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "astro-integration-kit": "^0.18.0",
     "cheerio": "^1.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@types/node": "^22.14.0",
-    "astro": "5.6.0",
+    "astro": "5.7.10",
     "typescript": "^5.8.2",
     "vite": ">=6"
   },

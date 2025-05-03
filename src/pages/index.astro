@@ -1,6 +1,7 @@
 ---
+import { getCollection } from "astro:content";
 import Typst from "../components/Typst.astro";
-import { TypstDocInput } from "../lib/typst.js";
+import { TypstDocInput } from "../lib/prelude";
 import Simp from "./simp.typ";
 import SimpHtml from "./simp-html.typ?html";
 
@@ -19,36 +20,52 @@ $oo$ $display(lim_(x → 0))$
 $ cal(A) := { x in RR | x "is natural" } $
 `;
 const input: TypstDocInput = {
-	mainFilePath: "src/content/typ/test.typ",
+  mainFilePath: "src/content/typ/test.typ",
 };
+
+const collections = await getCollection("typ");
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1><samp>astro-typst</samp> component playground</h1>
-		<main>
-			<h2>1: string code</h2>
-			<Typst code={code} target="html" />
-			<h3>
-				<code>width</code> set to <samp>"100%"</samp> and <code>height</code
-				> set to <samp>"auto"</samp>
-			</h3>
-			<!-- <Typst code={code} width={"100%"} height={"auto"} /> -->
-			<h2>2: <samp>simp.typ</samp></h2>
-			<Simp />
-			<h2>3: <samp>simp.typ html</samp></h2>
-			<SimpHtml />
-			<h2>4: <code>TypstDocInput</code></h2>
-			<Typst input={input} />
-			<h2>5: <code>mainFilePath</code></h2>
-			<Typst src={input.mainFilePath!} />
-		</main>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro</title>
+  </head>
+  <body>
+    <h1><samp>astro-typst</samp> component playground</h1>
+    <main>
+      <h2>0: Articles in the collection</h2>
+      <ul>
+        {
+          collections.map(({ slug, data }) => (
+            <li>
+              <a href={`/${slug}`}>
+                <h3>{data.title}</h3>
+              </a>
+              by
+              {data.author}
+            </li>
+          ))
+        }
+      </ul>
+      <h2>1: string code</h2>
+      <Typst code={code} target="html" />
+      <h3>
+        <code>width</code> set to <samp>"100%"</samp> and <code>height</code> set
+        to <samp>"auto"</samp>
+      </h3>
+      <!-- <Typst code={code} width={"100%"} height={"auto"} /> -->
+      <h2>2: <samp>simp.typ</samp></h2>
+      <Simp />
+      <h2>3: <samp>simp.typ html</samp></h2>
+      <SimpHtml />
+      <h2>4: <code>TypstDocInput</code></h2>
+      <Typst input={input} />
+      <h2>5: <code>mainFilePath</code></h2>
+      <Typst src={input.mainFilePath!} />
+    </main>
+  </body>
 </html>

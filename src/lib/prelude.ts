@@ -26,7 +26,22 @@ export type AstroTypstRenderOption = {
     [key: string]: any;
 }
 
+
+export type TypstTargetFormat = "html" | "svg";
+
+export const DefaultMode = {
+    default: "html" as TypstTargetFormat,
+    detect: function (path: string): TypstTargetFormat {
+        if (path.endsWith('.html.typ') || path.includes('/html/'))
+            return "html";
+        else if (path.endsWith('.svg.typ') || path.includes('/svg/'))
+            return "svg";
+        return this.default;
+    }
+}
+
 export type AstroTypstConfig = {
     /** The options for the typst renderer */
     options?: AstroTypstRenderOption;
+    mode: typeof DefaultMode;
 }
