@@ -37,7 +37,10 @@ export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument |
             frontmatter = data[0].value;
         }
     } catch (error) {
-        console.warn("Error querying frontmatter", error);
+        console.error("Querying frontmatter but got", error);
+        if (JSON.stringify(error).includes("unknown variable: html")) {
+            console.error("\x1b[41m\x1b[37m [astro-typst] \x1b[0m \x1b[31mYou may be rendering a Typst file that is intended to be using html export, but you are using SVG export. Please check if the file path matches the result of the `mode.detect` in your configuration.\x1b[0m");
+        }
     }
     return frontmatter;
 }
