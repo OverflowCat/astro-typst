@@ -21,6 +21,9 @@ $ cal(A) := { x in RR | x "is natural" } $
 `;
 const input: TypstDocInput = {
   mainFilePath: "src/content/typ/test.typ",
+  inputs: {
+    "something": "from Astro!",
+  }
 };
 
 const collections = await getCollection("typ");

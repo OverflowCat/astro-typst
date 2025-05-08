@@ -61,7 +61,10 @@ $
 $ f(t, z) CONV h(t, z) = INTOO INTOO f(alpha, beta) h(t - alpha, z - beta) dif alpha dif beta. $
 
 #set image(height: 2em)
-#stack(dir: ltr, )[Hello from ][astro]
+#stack(dir: ltr)[Hello from ][astro]
+
+This is data passed from `sys.input`: something #sys.inputs.at("something", default: "from typst.")
+
 #set square(size: 4cm)
 #figure(
   caption: "Rainbow squares",
