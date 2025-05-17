@@ -29,19 +29,31 @@ export type AstroTypstRenderOption = {
 
 export type TypstTargetFormat = "html" | "svg";
 
-export const DefaultMode = {
-    default: "html" as TypstTargetFormat,
-    detect: function (path: string): TypstTargetFormat {
-        if (path.endsWith('.html.typ') || path.includes('/html/'))
-            return "html";
-        else if (path.endsWith('.svg.typ') || path.includes('/svg/'))
-            return "svg";
-        return this.default;
-    }
-}
-
 export type AstroTypstConfig = {
     /** The options for the typst renderer */
     options?: AstroTypstRenderOption;
-    mode: typeof DefaultMode;
+    /** The target format detector */
+    target?:
+    | TypstTargetFormat
+    | ((path: string) => TypstTargetFormat | Promise<TypstTargetFormat>);
+};
+
+
+export function defaultTarget(path: string) {
+    if (path.endsWith('.html.typ') || path.includes('/html/'))
+        return "html";
+    else if (path.endsWith('.svg.typ') || path.includes('/svg/'))
+        return "svg";
+    return "html";
+}
+
+
+export async function detectTarget(path: string, target: AstroTypstConfig['target']) {
+    if (typeof target === 'function') {
+        const result = target(path);
+        if (result instanceof Promise)
+            return await result;
+        return result;
+    }
+    return target;
 }

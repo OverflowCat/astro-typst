@@ -23,16 +23,12 @@ export default defineConfig({
             options: {
                 remPx: 14
             },
-            mode: {
-                default: "svg",
-                detect: function (id: string): "html" | "svg" {
-                    console.debug(`Detecting ${id}`);
-                    if (id.endsWith('.html.typ') || id.includes('/html/'))
-                        return "html";
-                    else if (id.endsWith('.svg.typ') || id.includes('/svg/'))
-                        return "svg";
-                    return this.default;
-                }
+            target: (id: string) => {
+                console.debug(`Detecting ${id}`);
+                if (id.endsWith('.html.typ') || id.includes('/html/'))
+                    return "html";
+                return "svg";
             }
-        })],
+        })
+    ]
 });

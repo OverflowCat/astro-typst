@@ -5,7 +5,7 @@ import { renderToHTMLish } from "./typst.js";
 import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
 import { createResolver, watchDirectory } from "astro-integration-kit";
-import { DefaultMode, type AstroTypstConfig } from "./prelude.js";
+import { defaultTarget, detectTarget, type AstroTypstConfig } from "./prelude.js";
 
 const PACKAGE_NAME = 'astro-typst';
 
@@ -37,7 +37,7 @@ export default function typstIntegration(
         options: {
             remPx: 16
         },
-        mode: DefaultMode,
+        target: defaultTarget,
     }
 ): AstroIntegration {
     return {
@@ -54,7 +54,7 @@ export default function typstIntegration(
                     extensions: ['.typ'],
                     async getEntryInfo({ fileUrl, contents }) {
                         const mainFilePath = fileURLToPath(fileUrl);
-                        const isHtml = config.mode.detect(fileUrl.pathname) === "html";
+                        const isHtml = await detectTarget(fileUrl.pathname, config.target) === "html";
                         let { getFrontmatter } = await renderToHTMLish(
                             {
                                 mainFilePath,

@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTMLish } from "./typst.js";
 import { pathToFileURL } from "node:url";
-import type { AstroTypstConfig } from "./prelude.js";
+import { detectTarget, type AstroTypstConfig } from "./prelude.js";
 
 function isTypstFile(id: string) {
     return /\.typ(\?(html|svg|html&body|body&html))?$/.test(id);
@@ -105,7 +105,7 @@ export default function (config: AstroTypstConfig): Plugin {
             if (!isTypstFile(id)) return;
             const { path, opts } = extractOpts(id);
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            
+
             const isBody = opts.includes('body');
             let isHtml = false;
             if (opts.includes('svg')) {
@@ -113,7 +113,7 @@ export default function (config: AstroTypstConfig): Plugin {
             } else if (opts.includes('html')) {
                 isHtml = true;
             } else {
-                isHtml = config.mode.detect(path) === "html";
+                isHtml = await detectTarget(path, config.target) === "html";
             }
 
             const { html, getFrontmatter } = await renderToHTMLish(
