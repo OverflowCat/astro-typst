@@ -93,8 +93,7 @@ async function renderToSVGString_(
 ): Promise<string> {
     const docRes = $typst.compile(source);
     if (!docRes.result) {
-        const diags = $typst.fetchDiagnostics(docRes.takeDiagnostics()!);
-        console.error(diags);
+        docRes.printDiagnostics();
         return "";
     }
     const doc = docRes.result;
