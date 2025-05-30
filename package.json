@@ -1,7 +1,7 @@
 {
   "name": "astro-typst",
   "type": "module",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "packageManager": "pnpm@10.7.1",
   "repository": {
     "type": "git",
@@ -39,19 +39,19 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@myriaddreamin/typst-ts-node-compiler": "0.6.0-rc1",
-    "@myriaddreamin/typst-ts-renderer": "0.6.0-rc1",
-    "@myriaddreamin/typst.ts": "0.6.0-rc1",
+    "@myriaddreamin/typst-ts-node-compiler": "0.6.0",
+    "@myriaddreamin/typst-ts-renderer": "0.6.0",
+    "@myriaddreamin/typst.ts": "0.6.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "astro-integration-kit": "^0.18.0",
     "cheerio": "^1.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "@types/node": "^22.14.0",
+    "@types/node": "^22.15.28",
     "astro": "5.7.10",
-    "typescript": "^5.8.2",
-    "vite": ">=6"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
   },
   "peerDependencies": {
     "astro": ">= 3.0.0"
