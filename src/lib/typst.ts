@@ -134,7 +134,7 @@ export async function renderToHTML(
     const $typst = getOrInitCompiler();
     const docRes = $typst.compileHtml(source);
     if (!docRes.result) {
-        console.trace("Error compiling HTML", docRes.takeDiagnostics());
+        console.error("\x1b[41m[astro-typst]\x1b[0m \x1b[31mError compiling typst to HTML\x1b[0m");
         docRes.printDiagnostics();
         return { html: "" };
     }
