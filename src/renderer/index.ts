@@ -24,7 +24,7 @@ const renderer: NamedSSRLoadedRendererValue = {
 }
 
 function throwEnhancedErrorIfOrgComponent(error: Error, Component: any) {
-    if (Component[Symbol.for('org-component')]) {
+    if (Component[Symbol.for('astro-component')]) {
       // if it's an existing AstroError, we don't need to re-throw, keep the original hint
       if (AstroError.is(error)) return;
       // Provide better title and hint for the error overlay

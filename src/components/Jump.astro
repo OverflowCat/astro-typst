@@ -1,0 +1,70 @@
+---
+/**
+Copyright 2025 Myriad-Dreamin
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+---
+
+<script>
+function findAncestor(el, cls) {
+    while ((el = el.parentElement) && !el.classList.contains(cls));
+    return el;
+}
+
+// @ts-ignore
+window.handleTypstLocation = function (elem, page, x, y) {
+const docRoot = findAncestor(elem, "typst-doc");
+const children = docRoot.children;
+let nthPage = 0;
+for (let i = 0; i < children.length; i++) {
+    if (children[i].tagName === "g") {
+    nthPage++;
+    }
+    if (nthPage == page) {
+    const page = children[i];
+    const dataWidth = page.getAttribute("data-page-width");
+    const dataHeight = page.getAttribute("data-page-height");
+    const rect = page.getBoundingClientRect();
+    const xOffsetInner = Math.max(0, x / dataWidth - 0.05) * rect.width;
+    const yOffsetInner = Math.max(0, y / dataHeight - 0.05) * rect.height;
+    const xOffsetInnerFix = (x / dataWidth) * rect.width - xOffsetInner;
+    const yOffsetInnerFix = (y / dataHeight) * rect.height - yOffsetInner;
+
+    const docRoot = document.body || document.firstElementChild;
+    const basePos = docRoot.getBoundingClientRect();
+
+    const xOffset = rect.left - basePos.left + xOffsetInner;
+    const yOffset = rect.top - basePos.top + yOffsetInner;
+    const left = xOffset + xOffsetInnerFix;
+    const top = yOffset + yOffsetInnerFix;
+
+    console.log("scrolling to", xOffset, yOffset, left, top);
+
+    window.scrollTo(xOffset, yOffset);
+    const ripple = document.createElement("div");
+    ripple.className = "typst-ripple";
+    docRoot.appendChild(ripple);
+
+    ripple.style.left = left.toString() + "px";
+    ripple.style.top = top.toString() + "px";
+
+    ripple.style.animation = "typst-ripple-effect .4s linear";
+    ripple.onanimationend = () => {
+        docRoot.removeChild(ripple);
+    };
+    return;
+    }
+}
+};
+</script>
