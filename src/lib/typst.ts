@@ -55,7 +55,9 @@ export async function renderToSVGString(source: TypstDocInput, options: AstroTyp
     const $typst = source.mainFileContent ? getOrInitCompiler() : initCompiler();
     const svg = await renderToSVGString_($typst, source);
     $typst.evictCache(60);
-    let $ = load(svg);
+    let $ = load(svg, {
+        xml: true,
+    });
     (options?.cheerio?.preprocess) && ($ = options?.cheerio?.preprocess($, source));
     const remPx = options.remPx || 16;
     const width = $("svg").attr("width");
