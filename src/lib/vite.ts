@@ -3,6 +3,8 @@ import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTMLish } from "./typst.js";
 import { pathToFileURL } from "node:url";
 import { detectTarget, type AstroTypstConfig } from "./prelude.js";
+import path from "node:path/posix";
+import type { AstroConfig } from "astro";
 
 function isTypstFile(id: string) {
     return /\.typ(\?(html|svg|html&body|body&html))?$/.test(id);
@@ -23,7 +25,7 @@ function debug(...args: any[]) {
     }
 }
 
-export default function (config: AstroTypstConfig): Plugin {
+export default function (config: AstroTypstConfig, options: AstroConfig): Plugin {
     let server: ViteDevServer;
     const plugin: Plugin = {
         name: 'vite-plugin-astro-typ',
@@ -101,9 +103,10 @@ export default function (config: AstroTypstConfig): Plugin {
             });
         },
 
-        async transform(code: string, id: string) {
+
+        async transform(_: string, id: string) {
             if (!isTypstFile(id)) return;
-            const { path, opts } = extractOpts(id);
+            const { path: mainFilePath, opts } = extractOpts(id);
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
             const isBody = opts.includes('body');
@@ -113,30 +116,60 @@ export default function (config: AstroTypstConfig): Plugin {
             } else if (opts.includes('html')) {
                 isHtml = true;
             } else {
-                isHtml = await detectTarget(path, config.target) === "html";
+                isHtml = await detectTarget(mainFilePath, config.target) === "html";
             }
 
             const { html, getFrontmatter } = await renderToHTMLish(
                 {
-                    mainFilePath: path,
+                    mainFilePath,
                     body: isBody,
                 },
                 config.options,
                 isHtml
             );
-            return {
-                code: `
+
+            const contentHash = crypto.randomUUID().slice(0, 8);
+            const fileName = `typst-${contentHash}.svg`;
+
+            const normalizedSvgDirName = "typst"
+            const base = options.base ?? "/";
+            let publicUrl = path.join(base, normalizedSvgDirName, fileName);
+            console.log({
+                base,
+                normalizedSvgDirName,
+                fileName,
+                publicUrl,
+            })
+
+            let imgSvg = "";
+
+            if (import.meta.env.PROD) {
+                const emitName = path.join(normalizedSvgDirName, fileName);
+                const respId = this.emitFile({
+                    type: 'asset',
+                    fileName: emitName,
+                    source: Buffer.from(html, 'utf-8'),
+                });
+                console.log("emitFile", respId)
+                imgSvg = `<img src='${publicUrl}' />`;
+            } else { // 'serve' 模式
+                // use data inline
+                // imgSvg = `<img src='${publicUrl}' />`;
+                imgSvg = `<img src="data:image/svg+xml;base64,${Buffer.from(html, 'utf-8').toString('base64')}" />`;
+            }
+
+            const code = `
 import { createComponent, render, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
 export const name = "TypstComponent";
 export const html = ${JSON.stringify(html)};
 export const frontmatter = ${JSON.stringify(getFrontmatter())};
-export const file = ${JSON.stringify(path)};
-export const url = ${JSON.stringify(pathToFileURL(path))};
+export const file = ${JSON.stringify(mainFilePath)};
+export const url = ${JSON.stringify(pathToFileURL(mainFilePath))};
 export function rawContent() {
-    return ${JSON.stringify(await fs.readFile(path, 'utf-8'))};
+    return ${JSON.stringify(await fs.readFile(mainFilePath, 'utf-8'))};
 }
 export function compiledContent() {
-    return html;
+    return ${JSON.stringify(isHtml ? html : imgSvg)};
 }
 export function getHeadings() {
     return undefined;
@@ -146,10 +179,15 @@ export const Content = createComponent((result, _props, slots) => {
     const { layout, ...content } = frontmatter;
     content.file = file;
     content.url = url;
-    return render\`\${unescapeHTML(html)}\`;
+    // return render\`\${compiledContent()}\`;
+    return render\`\${unescapeHTML(compiledContent())}\`;
 });
+
 export default Content;
-`,
+`
+
+            return {
+                code,
                 map: null,
             }
         }

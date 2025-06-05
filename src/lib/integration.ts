@@ -94,7 +94,7 @@ declare module 'astro:content' {
                             }
                         },
                         // @ts-ignore
-                        plugins: [nodeResolve(), vitePluginTypst(config) as PluginOption],
+                        plugins: [nodeResolve(), vitePluginTypst(config, options) as PluginOption],
                     },
                 });
             },
