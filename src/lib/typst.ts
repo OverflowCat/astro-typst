@@ -4,6 +4,11 @@ import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
 
 let compilerIns: NodeCompiler | undefined;
 let dynCompilerIns: DynLayoutCompiler | undefined;
+let cheerioHandler: AstroTypstRenderOption["cheerio"] | undefined;
+
+export function setCheerio(cheerio: any) {
+    cheerioHandler = cheerio;
+}
 
 function prepareSource(source: TypstDocInput, _options: any) {
     if (typeof source === "string") {
@@ -45,18 +50,20 @@ export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument |
     return frontmatter;
 }
 
+type RenderToSVGStringOption = Omit<AstroTypstRenderOption, "cheerio">;
+
 /**
  * @param source The source code of the .typ file.
  * @param options Options for rendering the SVG.
  * @returns The SVG string.
  */
-export async function renderToSVGString(source: TypstDocInput, options: AstroTypstRenderOption) {
+export async function renderToSVGString(source: TypstDocInput, options: RenderToSVGStringOption) {
     source = prepareSource(source, options);
     const $typst = source.mainFileContent ? getOrInitCompiler() : initCompiler();
     const svg = await renderToSVGString_($typst, source);
     $typst.evictCache(60);
     let $ = load(svg);
-    (options?.cheerio?.preprocess) && ($ = options?.cheerio?.preprocess($, source));
+    (cheerioHandler?.preprocess) && ($ = cheerioHandler?.preprocess($, source));
     const remPx = options.remPx || 16;
     const width = $("svg").attr("width");
     if (options.width === undefined && width !== undefined) {
@@ -81,8 +88,8 @@ export async function renderToSVGString(source: TypstDocInput, options: AstroTyp
             $("svg").attr(key, value as any);
         }
     }
-    (options.cheerio?.postprocess) && ($ = options?.cheerio?.postprocess($, source));
-    const svgString = options.cheerio?.stringify ? options.cheerio.stringify($, source) : $.html();
+    (cheerioHandler?.postprocess) && ($ = cheerioHandler?.postprocess($, source));
+    const svgString = cheerioHandler?.stringify ? cheerioHandler.stringify($, source) : $.html();
     // @ts-ignore
     return { svg: svgString, frontmatter: () => getFrontmatter($typst, source) };
 }
@@ -126,29 +133,25 @@ export async function renderToDynamicLayout(
 }
 
 export async function renderToHTML(
-    source: TypstDocInput & { body?: boolean },
+    source: TypstDocInput,
     options: any,
 ) {
-    const onlyBody = source.body;
     source = prepareSource(source, options);
     const $typst = getOrInitCompiler();
     const docRes = $typst.compileHtml(source);
     if (!docRes.result) {
         console.error("\x1b[41m[astro-typst]\x1b[0m \x1b[31mError compiling typst to HTML\x1b[0m");
         docRes.printDiagnostics();
-        return { html: "" };
+        return { html: undefined };
     }
     const doc = docRes.result;
     const html = $typst.tryHtml(doc);
     if (!html.result) {
         html.printDiagnostics();
-        return { html: "" };
+        return { html: undefined };
     }
     return {
-        html:
-            onlyBody ?
-                html.result.body() :
-                html.result.html(),
+        html: html.result,
         frontmatter: () => getFrontmatter($typst, doc),
     };
 }
@@ -166,7 +169,7 @@ export async function renderToHTMLish(
             source,
             options
         );
-        html = htmlRes;
+        html = (source.body ? htmlRes?.body() : htmlRes?.html()) || "";
         getFrontmatter = frontmatter || (() => ({}));
     } else /* svg */ {
         let { svg, frontmatter } = await renderToSVGString(

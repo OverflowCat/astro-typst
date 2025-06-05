@@ -1,8 +1,11 @@
-import fs from "fs/promises";
 import { type Plugin, type ViteDevServer } from "vite";
-import { renderToHTMLish } from "./typst.js";
-import { pathToFileURL } from "node:url";
+import { setCheerio as compilerSetCheerio } from "./typst.js";
 import { detectTarget, type AstroTypstConfig } from "./prelude.js";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 function isTypstFile(id: string) {
     return /\.typ(\?(html|svg|html&body|body&html))?$/.test(id);
@@ -25,9 +28,40 @@ function debug(...args: any[]) {
 
 export default function (config: AstroTypstConfig): Plugin {
     let server: ViteDevServer;
+
+    // Extracts `cheerio` which is not serializable.
+    const compileConfig = { ...config.options };
+    if (compileConfig?.cheerio) {
+        compilerSetCheerio(compileConfig.cheerio);
+        delete compileConfig.cheerio;
+    }
+    // Serialize the compileConfig to JSON.
+    const compileConfigString = JSON.stringify(compileConfig);
+
     const plugin: Plugin = {
         name: 'vite-plugin-astro-typ',
         enforce: 'pre',
+
+        // Resolves `astro-typst/runtime` statically, so that we 
+        // can use it in typst components reliably.
+        config(config, env) {
+
+            config.resolve ||= {};
+            config.resolve.alias ||= {};
+
+            if (config.resolve.alias instanceof Array) {
+                config.resolve.alias = [
+                    ...config.resolve.alias,
+                    {
+                        find: 'astro-typst/runtime',
+                        replacement: resolve(__dirname, 'typst.js'),
+                    },
+                ];
+            } else {
+                config.resolve.alias['astro-typst/runtime'] = resolve(__dirname, 'typst.js');
+            }
+
+        },
 
         // resolveId(source, importer, options) {
         //     if (!isTypstFile(source)) return null;
@@ -86,10 +120,10 @@ export default function (config: AstroTypstConfig): Plugin {
                 if (isTypstFile(filePath)) {
                     const modules = server.moduleGraph.getModulesByFile(filePath);
                     if (modules) {
-                        for (const mod of modules) {
+                        modules.forEach(mod => {
                             debug(`[vite-plugin-astro-typ] Invalidating module: ${mod.id}`);
                             server.moduleGraph.invalidateModule(mod);
-                        }
+                        })
                     } else {
                         debug(`[vite-plugin-astro-typ] No modules found for file: ${filePath}`);
                         server.ws.send({
@@ -116,24 +150,41 @@ export default function (config: AstroTypstConfig): Plugin {
                 isHtml = await detectTarget(path, config.target) === "html";
             }
 
-            const { html, getFrontmatter } = await renderToHTMLish(
-                {
-                    mainFilePath: path,
-                    body: isBody,
-                },
-                config.options,
-                isHtml
-            );
+            const docArgs = JSON.stringify({ mainFilePath: path, body: isBody });
+
             return {
                 code: `
 import { createComponent, render, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
+import { pathToFileURL } from "node:url";
+import fs from "fs/promises";
+import { renderToHTML, renderToSVGString } from "astro-typst/runtime";
+
+const docArgs = ${docArgs};
+// todo: will getFrontmatter be always used in most cases?
+const { html: htmlDoc, svg, frontmatter: getFrontmatter } = await ${isHtml ? "renderToHTML" : "renderToSVGString"}(
+    docArgs,
+    ${compileConfigString},
+);
 export const name = "TypstComponent";
-export const html = ${JSON.stringify(html)};
-export const frontmatter = ${JSON.stringify(getFrontmatter())};
-export const file = ${JSON.stringify(path)};
-export const url = ${JSON.stringify(pathToFileURL(path))};
+let bodyCache = undefined;
+let htmlCache = undefined;
+const getHtml = (body) => {
+  if (!htmlDoc) { return ""; }
+  return body ?
+    (bodyCache === undefined ? (bodyCache = htmlDoc.body()) : bodyCache) :
+    (htmlCache === undefined ? (htmlCache = htmlDoc.html()) : htmlCache);
+}
+
+// todo: html are always rendered...
+export const html = ${isHtml ? "getHtml(docArgs.body)" : "svg"};
+export const frontmatter = getFrontmatter();
+export const file = docArgs.mainFilePath;
+export const url = pathToFileURL(file);
+
+// todo: content are always read from disk, but is it really used in most cases?
+const content = await fs.readFile(file, 'utf-8');
 export function rawContent() {
-    return ${JSON.stringify(await fs.readFile(path, 'utf-8'))};
+    return content;
 }
 export function compiledContent() {
     return html;
@@ -142,11 +193,12 @@ export function getHeadings() {
     return undefined;
 }
 
-export const Content = createComponent((result, _props, slots) => {
+export const Content = createComponent((result, props, slots) => {
     const { layout, ...content } = frontmatter;
     content.file = file;
     content.url = url;
-    return render\`\${unescapeHTML(html)}\`;
+    const toRender = ${isHtml ? "getHtml(props?.body || docArgs.body)" : "svg"};
+    return render(toRender);
 });
 export default Content;
 `,
