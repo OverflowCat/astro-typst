@@ -1,7 +1,8 @@
-import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument } from "@myriaddreamin/typst-ts-node-compiler";
+import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument, type CompileArgs } from "@myriaddreamin/typst-ts-node-compiler";
 import { load } from "cheerio";
-import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
+import type { AstroTypstConfig, AstroTypstRenderOption, TypstDocInput } from "./prelude";
 import logger from "./logger";
+import { getConfig } from "./store";
 
 /** The cached compiler instance */
 let compilerIns: NodeCompiler | undefined;
@@ -16,10 +17,20 @@ function prepareSource(source: TypstDocInput, _options: any) {
     return source;
 }
 
-function initCompiler(): NodeCompiler {
-    return NodeCompiler.create({
+function getInitOptions(): CompileArgs {
+    const config = getConfig();
+    const initOptions: CompileArgs = {
         workspace: "./", // default
-    });
+    }
+    if (config.fontArgs) {
+        initOptions.fontArgs = config.fontArgs;
+    }
+    return initOptions;
+}
+
+function initCompiler(): NodeCompiler {
+
+    return NodeCompiler.create(getInitOptions());
 }
 
 function getOrInitCompiler(): NodeCompiler {
@@ -27,9 +38,9 @@ function getOrInitCompiler(): NodeCompiler {
 }
 
 function getOrInitDynCompiler(): DynLayoutCompiler {
-    return (dynCompilerIns ||=  DynLayoutCompiler.fromBoxed(NodeCompiler.create({
-        workspace: "./", // default
-    }).intoBoxed()));
+    return (dynCompilerIns ||= DynLayoutCompiler.fromBoxed(
+        NodeCompiler.create(getInitOptions()).intoBoxed())
+    );
 }
 
 export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument | CompileDocArgs) {

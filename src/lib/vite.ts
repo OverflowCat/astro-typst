@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 import { detectTarget, type AstroTypstConfig } from "./prelude.js";
 import logger from "./logger.js";
 import path from "node:path/posix";
+import { setConfig } from "./store.js";
 import type { AstroConfig } from "astro";
 
 function isTypstFile(id: string) {
@@ -27,6 +28,7 @@ function debug(...args: any[]) {
 }
 
 export default function (config: AstroTypstConfig, options: AstroConfig): Plugin {
+    setConfig(config);
     let server: ViteDevServer;
     const plugin: Plugin = {
         name: 'vite-plugin-astro-typ',

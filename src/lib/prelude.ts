@@ -1,4 +1,4 @@
-import type { CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler";
+import type { CompileArgs, CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler";
 import type { CheerioAPI } from "cheerio";
 
 
@@ -34,6 +34,8 @@ export type AstroTypstConfig = {
     options?: AstroTypstRenderOption;
     /** Only use body for HTML output */
     body?: boolean;
+    /** Font args */
+    fontArgs?: CompileArgs['fontArgs'];
     /** The target format detector */
     target?:
     | TypstTargetFormat
