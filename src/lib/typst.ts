@@ -1,8 +1,8 @@
 import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument, type CompileArgs } from "@myriaddreamin/typst-ts-node-compiler";
 import { load } from "cheerio";
-import type { AstroTypstConfig, AstroTypstRenderOption, TypstDocInput } from "./prelude";
-import logger from "./logger";
-import { getConfig } from "./store";
+import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
+import logger from "./logger.js";
+import { getConfig } from "./store.js";
 
 /** The cached compiler instance */
 let compilerIns: NodeCompiler | undefined;
@@ -28,8 +28,7 @@ function getInitOptions(): CompileArgs {
     return initOptions;
 }
 
-function initCompiler(): NodeCompiler {
-
+function initCompiler(): NodeCompiler { 
     return NodeCompiler.create(getInitOptions());
 }
 

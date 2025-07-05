@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
 import { createResolver, watchDirectory } from "astro-integration-kit";
 import { defaultTarget, detectTarget, type AstroTypstConfig } from "./prelude.js";
+import { getConfig, setConfig } from "./store.js";
 import logger from "./logger.js";
 
 const PACKAGE_NAME = 'astro-typst';
@@ -46,6 +47,7 @@ export default function typstIntegration(
         name: 'typst',
         hooks: {
             "astro:config:setup": (options) => {
+                setConfig(config);
                 const {
                     addRenderer, addContentEntryType, addPageExtension, updateConfig
                 } = (options as SetupHookParams);

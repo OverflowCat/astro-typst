@@ -24,7 +24,7 @@ An Astro [Integration](https://astro.build/integrations/) that lets you render [
 - [x] Render to `<img>` with `src=` emitted SVG assets (#20)
 - [ ] Responsive SVGs
 - [ ] [Paged output](https://github.com/OverflowCat/astro-typst/issues/3)
-- [ ] Add font files or blobs
+- [x] Add font files or blobs (`fontArgs` in config)
 
 ## Installation
 
@@ -59,12 +59,18 @@ export default defineConfig({
           return "html";
         return "svg";
       },
+      // emitSvg: true,
+      // emitSvgDir: ".astro/typst"
+      // fontArgs: [
+      //   { fontPaths: ['/system/fonts', '/user/fonts'] },
+      //   { fontBlobs: [customFontBuffer] }
+      // ],
     }),
   ],
 });
 ```
 
-The `detect` function determines which mode a file will render in. The default is:
+The `target` function determines which mode a file will render in. The default is:
 
 ```
 *.html.typ => html export
