@@ -96,18 +96,18 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
                 const contentHash = crypto.randomUUID().slice(0, 8);
                 const fileName = `typst-${contentHash}.svg`;
 
-                const normalizedSvgDirName = "typst"
+                const emitSvgDir = config.emitSvgDir ?? "typst";
                 const base = options.base ?? "/";
-                let publicUrl = path.join(base, normalizedSvgDirName, fileName);
+                let publicUrl = path.join(base, emitSvgDir, fileName);
                 logger.debug({
                     base,
-                    normalizedSvgDirName,
+                    emitSvgDir,
                     fileName,
                     publicUrl,
                 })
 
                 if (import.meta.env.PROD) { // 'build' mode
-                    const emitName = path.join(normalizedSvgDirName, fileName);
+                    const emitName = path.join(emitSvgDir, fileName);
                     const respId = this.emitFile({
                         type: 'asset',
                         fileName: emitName,

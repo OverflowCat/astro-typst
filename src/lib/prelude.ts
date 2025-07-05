@@ -36,8 +36,21 @@ export type AstroTypstConfig = {
     target?:
     | TypstTargetFormat
     | ((path: string) => TypstTargetFormat | Promise<TypstTargetFormat>);
-    /** Whether to emit standalone img for svg */
+    /**
+     * Whether to emit standalone img for svg.
+     * Only works when `target` is `"svg"`.
+     * 
+     * @default false
+    */
     emitSvg?: boolean;
+    /**
+     * The directory to emit svg files. Only for build mode.
+     * In dev mode, the svg will be inlined as base64.
+     * The directory is relative to the `base` of your Astro config.
+     * @default "typst"
+     * @example ".astro/typst"
+     */
+    emitSvgDir?: string;
 };
 
 
