@@ -21,7 +21,7 @@ An Astro [Integration](https://astro.build/integrations/) that lets you render [
 - [x] Jump between internal links ([client JS](https://github.com/OverflowCat/astro-typst/issues/6) needed)
 - [x] Pass JS data to typst using the component ([how](https://github.com/OverflowCat/astro-typst/issues/2))
 - [ ] Pass data from typst to JS
-- [ ] Render to `<img>` with `src=` emitted SVG assets [WIP]
+- [x] Render to `<img>` with `src=` emitted SVG assets (#20)
 - [ ] Responsive SVGs
 - [ ] [Paged output](https://github.com/OverflowCat/astro-typst/issues/3)
 - [ ] Add font files or blobs
