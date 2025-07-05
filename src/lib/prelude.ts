@@ -32,6 +32,8 @@ export type TypstTargetFormat = "html" | "svg";
 export type AstroTypstConfig = {
     /** The options for the typst renderer */
     options?: AstroTypstRenderOption;
+    /** Only use body for HTML output */
+    body?: boolean;
     /** The target format detector */
     target?:
     | TypstTargetFormat
