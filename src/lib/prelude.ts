@@ -36,6 +36,8 @@ export type AstroTypstConfig = {
     target?:
     | TypstTargetFormat
     | ((path: string) => TypstTargetFormat | Promise<TypstTargetFormat>);
+    /** Whether to emit standalone img for svg */
+    emitSvg?: boolean;
 };
 
 

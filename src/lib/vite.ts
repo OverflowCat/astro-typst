@@ -3,6 +3,7 @@ import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTMLish } from "./typst.js";
 import { pathToFileURL } from "node:url";
 import { detectTarget, type AstroTypstConfig } from "./prelude.js";
+import logger from "./logger.js";
 import path from "node:path/posix";
 import type { AstroConfig } from "astro";
 
@@ -111,15 +112,16 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
 
             const isBody = opts.includes('body');
             let isHtml = false;
-            if (opts.includes('svg')) {
+            if (opts.includes('svg') || opts.includes("img")) {
                 isHtml = false;
             } else if (opts.includes('html')) {
                 isHtml = true;
             } else {
                 isHtml = await detectTarget(mainFilePath, config.target) === "html";
             }
+            let emitSvg = opts.includes('img') || config?.emitSvg === true;
 
-            const { html, getFrontmatter } = await renderToHTMLish(
+            let { html, getFrontmatter } = await renderToHTMLish(
                 {
                     mainFilePath,
                     body: isBody,
@@ -128,34 +130,36 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
                 isHtml
             );
 
-            const contentHash = crypto.randomUUID().slice(0, 8);
-            const fileName = `typst-${contentHash}.svg`;
+            if (emitSvg) {
+                let imgSvg = "";
+                const contentHash = crypto.randomUUID().slice(0, 8);
+                const fileName = `typst-${contentHash}.svg`;
 
-            const normalizedSvgDirName = "typst"
-            const base = options.base ?? "/";
-            let publicUrl = path.join(base, normalizedSvgDirName, fileName);
-            console.log({
-                base,
-                normalizedSvgDirName,
-                fileName,
-                publicUrl,
-            })
+                const normalizedSvgDirName = "typst"
+                const base = options.base ?? "/";
+                let publicUrl = path.join(base, normalizedSvgDirName, fileName);
+                logger.debug({
+                    base,
+                    normalizedSvgDirName,
+                    fileName,
+                    publicUrl,
+                })
 
-            let imgSvg = "";
-
-            if (import.meta.env.PROD) {
-                const emitName = path.join(normalizedSvgDirName, fileName);
-                const respId = this.emitFile({
-                    type: 'asset',
-                    fileName: emitName,
-                    source: Buffer.from(html, 'utf-8'),
-                });
-                console.log("emitFile", respId)
-                imgSvg = `<img src='${publicUrl}' />`;
-            } else { // 'serve' 模式
-                // use data inline
-                // imgSvg = `<img src='${publicUrl}' />`;
-                imgSvg = `<img src="data:image/svg+xml;base64,${Buffer.from(html, 'utf-8').toString('base64')}" />`;
+                if (import.meta.env.PROD) {
+                    const emitName = path.join(normalizedSvgDirName, fileName);
+                    const respId = this.emitFile({
+                        type: 'asset',
+                        fileName: emitName,
+                        source: Buffer.from(html, 'utf-8'),
+                    });
+                    logger.debug("emitFile", respId)
+                    imgSvg = `<img src='${publicUrl}' />`;
+                } else { // 'serve' 模式
+                    // use data inline
+                    // imgSvg = `<img src='${publicUrl}' />`;
+                    imgSvg = `<img src="data:image/svg+xml;base64,${Buffer.from(html, 'utf-8').toString('base64')}" />`;
+                }
+                html = imgSvg;
             }
 
             const code = `
@@ -169,7 +173,7 @@ export function rawContent() {
     return ${JSON.stringify(await fs.readFile(mainFilePath, 'utf-8'))};
 }
 export function compiledContent() {
-    return ${JSON.stringify(isHtml ? html : imgSvg)};
+    return ${JSON.stringify(html)};
 }
 export function getHeadings() {
     return undefined;

@@ -1,6 +1,7 @@
 import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument } from "@myriaddreamin/typst-ts-node-compiler";
 import { load } from "cheerio";
 import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
+import logger from "./logger";
 
 let compilerIns: NodeCompiler | undefined;
 let dynCompilerIns: DynLayoutCompiler | undefined;
@@ -17,7 +18,6 @@ function initCompiler(): NodeCompiler {
         workspace: "./", // default
     });
 }
-
 
 function getOrInitCompiler(): NodeCompiler {
     return (compilerIns ||= initCompiler());
@@ -37,9 +37,9 @@ export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument |
             frontmatter = data[0].value;
         }
     } catch (error) {
-        console.error("Querying frontmatter but got", error);
+        logger.compileError("Querying frontmatter but got", error);
         if (JSON.stringify(error).includes("unknown variable: html")) {
-            console.error("\x1b[41m\x1b[37m [astro-typst] \x1b[0m \x1b[31mYou may be rendering a Typst file that is intended to be using html export, but you are using SVG export. Please check if the file path matches the result of the `mode.detect` in your configuration.\x1b[0m");
+            logger.compileError("You may be rendering a Typst file that is intended to be using html export, but you are using SVG export. Please check if the file path matches the result of the `mode.detect` in your configuration.");
         }
     }
     return frontmatter;
@@ -136,7 +136,7 @@ export async function renderToHTML(
     const $typst = getOrInitCompiler();
     const docRes = $typst.compileHtml(source);
     if (!docRes.result) {
-        console.error("\x1b[41m[astro-typst]\x1b[0m \x1b[31mError compiling typst to HTML\x1b[0m");
+        logger.error("Error compiling typst to HTML");
         docRes.printDiagnostics();
         return { html: "" };
     }

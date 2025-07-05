@@ -6,13 +6,14 @@ import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
 import { createResolver, watchDirectory } from "astro-integration-kit";
 import { defaultTarget, detectTarget, type AstroTypstConfig } from "./prelude.js";
+import logger from "./logger.js";
 
 const PACKAGE_NAME = 'astro-typst';
 
 function getRenderer(): AstroRenderer {
     const isDebug = !!process.env.ASTRO_TYPST;
     const serverEntrypoint = (isDebug ? "" : "astro-typst/") + "src/renderer/index.js";
-    isDebug && console.debug(`\x1b[42mYou are running the demo of \x1b[33mastro-typst\x1b[42m, not importing the package from elsewhere.\x1b[0m
+    logger.debug(`\x1b[42mYou are running the demo of \x1b[33mastro-typst\x1b[42m, not importing the package from elsewhere.\x1b[0m
 \x1b[32mThis mode is good for test, debug, and build the demo site.\x1b[0m
 Server entry point: ${serverEntrypoint}`);
     return {
