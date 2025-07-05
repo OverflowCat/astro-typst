@@ -29,7 +29,9 @@ export default defineConfig({
                 if (id.endsWith('.html.typ') || id.includes('/html/'))
                     return "html";
                 return "svg";
-            }
+            },
+            emitSvg: true,
+            emitSvgDir: ".astro/typst",
         })
     ]
 });

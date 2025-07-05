@@ -99,6 +99,8 @@ import Paper from "./_test.typ?svg";
 <Paper />
 ```
 
+You can also emit SVG to standalone files on build mode. Modify the `emitSvg` and `emitSvgDir` option in the config. (Added in v0.10)
+
 ### As a component
 
 To use the component, you need to manually install a dependency to avoid SSR errors:
