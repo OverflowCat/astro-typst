@@ -3,7 +3,10 @@ import { load } from "cheerio";
 import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
 import logger from "./logger";
 
+/** The cached compiler instance */
 let compilerIns: NodeCompiler | undefined;
+
+/** The cached dynamic layout compiler instance */
 let dynCompilerIns: DynLayoutCompiler | undefined;
 
 function prepareSource(source: TypstDocInput, _options: any) {
@@ -24,9 +27,9 @@ function getOrInitCompiler(): NodeCompiler {
 }
 
 function getOrInitDynCompiler(): DynLayoutCompiler {
-    return (dynCompilerIns ||= DynLayoutCompiler.fromBoxed(
-        getOrInitCompiler().intoBoxed(),
-    ));
+    return (dynCompilerIns ||=  DynLayoutCompiler.fromBoxed(NodeCompiler.create({
+        workspace: "./", // default
+    }).intoBoxed()));
 }
 
 export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument | CompileDocArgs) {
@@ -117,7 +120,6 @@ export async function renderToDynamicLayout(
     source: TypstDocInput,
     options: any,
 ) {
-    // inputs: { 'x-target': 'web' },
     if (!options["x-target"]) {
         options["x-target"] = "web";
     }
@@ -131,7 +133,7 @@ export async function renderToHTML(
     source: TypstDocInput & { body?: boolean },
     options: any,
 ) {
-    const onlyBody = source.body;
+    const onlyBody = source.body !== false;
     source = prepareSource(source, options);
     const $typst = getOrInitCompiler();
     const docRes = $typst.compileHtml(source);
@@ -164,6 +166,7 @@ export async function renderToHTMLish(
     var html: string;
     var getFrontmatter = () => ({});
     if (isHtml) {
+        source.body = options.body !== false;
         let { html: htmlRes, frontmatter } = await renderToHTML(
             source,
             options

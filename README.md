@@ -3,9 +3,9 @@
 ![NPM Version](https://img.shields.io/npm/v/astro-typst?style=for-the-badge)
 <a href='https://typst.app/' target="_blank"><img alt='Supported Typst version: 0.13' src='https://img.shields.io/badge/Typst_0.13-100000?style=for-the-badge&logo=Typst&logoColor=30bdc1&labelColor=FFFFFF&color=30BDB2' />
 
-An Astro Integration that lets you render Typst within Astro.
+An Astro [Integration](https://astro.build/integrations/) that lets you render [Typst](https://github.com/typst/typst) within [Astro](https://github.com/withastro/astro) based on [typst.ts](https://github.com/Myriad-Dreamin/typst.ts). We have made you an Astro-ish wrapper that you cannot refuse!
 
-<img src="https://github.com/user-attachments/assets/613eaf8e-53da-4cf0-bbaa-f32592d7f742" alt="Demo" width="400" />
+<img src="https://repository-images.githubusercontent.com/836661120/7c4046ff-03be-45dc-a28b-393d23dcd614" alt="Demo" width="500" />
 
 ## Features
 
@@ -18,9 +18,12 @@ An Astro Integration that lets you render Typst within Astro.
 - [x] Static HTML output without JavaScript
 - [x] [Content collections](https://docs.astro.build/en/guides/content-collections/)
 - [x] Write frontmatter directly in `.typ`
-- [ ] Pass data from JS to typst
+- [x] Jump between internal links ([client JS](https://github.com/OverflowCat/astro-typst/issues/6) needed)
+- [x] Pass JS data to typst using the component ([how](https://github.com/OverflowCat/astro-typst/issues/2))
 - [ ] Pass data from typst to JS
+- [ ] Render to `<img>` with `src=` emitted SVG assets [WIP]
 - [ ] Responsive SVGs
+- [ ] [Paged output](https://github.com/OverflowCat/astro-typst/issues/3)
 - [ ] Add font files or blobs
 
 ## Installation

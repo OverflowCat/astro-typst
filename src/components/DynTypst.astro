@@ -1,41 +1,45 @@
 ---
-import { renderToDynamicLayout, type TypstDocInput } from "../lib/typst.js";
+import { renderToDynamicLayout } from "../lib/typst";
+import type { TypstDocInput } from "../lib/prelude.js";
 
 export type Props = (
-    | { code: string }
-    | { src: string }
-    | { input: TypstDocInput }
+  | { code: string }
+  | { src: string }
+  | { input: TypstDocInput }
 ) &
-    TypstOptions;
+  TypstOptions;
 
 export type TypstOptions = {
-    /**
-     * Whether to add default style for anchors to function.
-     *
-     * If you have multiple svg elements in the same page,
-     * you may want to set this to `false`, and import
-     * the stylesheet manually.
-     *
-     * @default true
-     */
-    style?: boolean;
-    /** @default "auto" */
-    width?: number | string;
-    /** @default "auto" */
-    height?: number | string;
-    /** @default 16 */
-    remPx?: number;
-    /** @default 2 */
-    scale?: number;
+  /**
+   * Whether to add default style for anchors to function.
+   *
+   * If you have multiple svg elements in the same page,
+   * you may want to set this to `false`, and import
+   * the stylesheet manually.
+   *
+   * @default true
+   */
+  style?: boolean;
+  /** @default "auto" */
+  width?: number | string;
+  /** @default "auto" */
+  height?: number | string;
+  /** @default 16 */
+  remPx?: number;
+  /** @default 1 */
+  scale?: number;
 };
 
 const options = Astro.props;
+if (options.scale === undefined) {
+  options.scale = 1;
+}
 let input: TypstDocInput =
-    "src" in options
-        ? { mainFilePath: options.src }
-        : "code" in options
-          ? options.code
-          : options.input;
+  "src" in options
+    ? { mainFilePath: options.src }
+    : "code" in options
+      ? options.code
+      : options.input;
 
 console.info({ input, options });
 const vectorArtifact = await renderToDynamicLayout(input, options);
@@ -43,318 +47,467 @@ console.info({ vectorArtifact, length: vectorArtifact.length });
 ---
 
 <script is:inline define:vars={{ vectorArtifact }}>
-    window.vectorArtifact = vectorArtifact;
+  window.vectorArtifact = vectorArtifact;
 </script>
 <script>
-    import { createTypstRenderer } from "@myriaddreamin/typst.ts/dist/esm/renderer.mjs";
-    const moduleInitOptions = {
-        beforeBuild: [],
-        getModule: () =>
-            "/node_modules/@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm",
+  window.typstBindSvgDom = function () {};
+  window.captureStack = function () {
+    return undefined;
+  };
+  let appContainer =
+    document.currentScript && document.currentScript.parentElement;
+  import { RenderSession } from "@myriaddreamin/typst-ts-renderer";
+  import { createTypstRenderer } from "@myriaddreamin/typst.ts/dist/esm/renderer.mjs";
+
+  function getViewport(appElem) {
+    const domScale = 1.5;
+    const appPos = appElem.getBoundingClientRect();
+    const left = appPos.left;
+    const top = -appPos.top;
+    const right = window.innerWidth;
+    const bottom = window.innerHeight - appPos.top;
+    const rect = {
+      x: 0,
+      y: top / domScale,
+      width: Math.max(right - left, 0) / domScale,
+      height: Math.max(bottom - top, 0) / domScale,
     };
-    window["typstBindSemantics"] = function () {};
-    window["typstBindSvgDom"] = function () {};
-    window["captureStack"] = function () {
-        return undefined;
+    if (rect.width <= 0 || rect.height <= 0) {
+      rect.x = rect.y = rect.width = rect.height = 0;
+    }
+    // console.log('ccc', basePos, appPos, rect);
+    return rect;
+  }
+  const throttle = (fn: () => void, delay: number) => {
+    let lastTime = 0;
+    return () => {
+      const now = Date.now();
+      if (now - lastTime >= delay) {
+        fn();
+        lastTime = now;
+      }
     };
+  };
 
-    // elem.style.top = `calc(var(--data-text-height) * ${rrt})`;
-    // elem.style.left = `calc(var(--data-text-width) * ${rrl})`;
-    const documentReady = () => {
-        let plugin = createTypstRenderer();
-        plugin.init(moduleInitOptions).then(async () => {
-            const artifactData = new Uint8Array(window["vectorArtifact"].data);
+  const moduleInitOptions = {
+    beforeBuild: [],
+    getModule: () =>
+      "/node_modules/@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm",
+  };
+  window["typstBindSemantics"] = function () {};
+  window["typstBindSvgDom"] = function () {};
+  window["captureStack"] = function () {
+    return undefined;
+  };
 
-            const appElem = document.getElementById("typst-app")!;
+  // elem.style.top = `calc(var(--data-text-height) * ${rrt})`;
+  // elem.style.left = `calc(var(--data-text-width) * ${rrl})`;
+  const documentReady = async () => {
+    const artifactData = new Uint8Array(window["vectorArtifact"].data);
+    // const appElem = document.getElementById("typst-dyn-canvas")! as HTMLCanvasElement;
+    const appElem = document.getElementById("typst-dyn-elem")!;
+    // const r = async (ses: RenderSession) => {
+    //   const dom = await plugin.renderDom({
+    //     renderSession: ses,
+    //     artifactContent: artifactData,
+    //     container: appElem,
+    //     pixelPerPt: 4.5,
+    //   });
+    // };
 
-            let renderStart: DOMHighResTimeStamp;
-            const domRender = async (ses) => {
-                const dom = await plugin.renderDom({
-                    renderSession: ses,
-                    container: appElem,
-                    pixelPerPt: 4.5,
-                    domScale: 1.5,
-                });
-                console.log(
-                    "render time!!!!!!!!!",
-                    performance.now() - renderStart,
-                );
-                console.log(dom);
-
-                dom.addChangement(["new", artifactData as unknown as string]);
-                const viewportHandler = () => dom.addViewportChange();
-                window.addEventListener("resize", viewportHandler);
-                window.addEventListener("scroll", viewportHandler);
-            };
-
-            plugin.runWithSession(
-                (ses) =>
-                    new Promise(async (dispose) => {
-                        renderStart = performance.now();
-                        // await canvasRender(ses);
-                        await domRender(ses);
-
-                        void dispose;
-                    }),
-            );
-
-            console.log("render done");
+    let plugin = createTypstRenderer();
+    await plugin.init(moduleInitOptions);
+    // plugin.init(moduleInitOptions).then(async () => {
+    //   const viewportHandler = throttle(() => {
+    //     r(plugin.createSession());
+    //   }, 100);
+    //   appElem.addEventListener("resize", viewportHandler);
+    //   window.addEventListener("resize", viewportHandler);
+    //   appElem.addEventListener("scroll", viewportHandler);
+    // });
+    let session: RenderSession | undefined = undefined;
+    let initialRender = true;
+    const typstBindCustomSemantics = async (root, svg, semantics) => {
+      console.log("bind custom semantics", root, svg, semantics);
+      const customs = await plugin.getCustomV1({
+        renderSession: session,
+      });
+      const semaLabel = customs.find((k) => k[0] === "sema-label");
+      if (semaLabel) {
+        const labelBin = semaLabel[1];
+        const labels = JSON.parse(dec.decode(labelBin));
+        globalSemaLabels = labels.map(([label, pos]) => {
+          const [_, u, x, y] = pos.split(/[pxy]/).map(Number.parseFloat);
+          return [encodeURIComponent(label), svg, [u, x, y]];
         });
+      }
+
+      // postProcessCrossLinks(semantics);
+
+      // todo: out of page
+      if (window.location.hash) {
+        // console.log('hash', window.location.hash);
+
+        // parse location.hash = `loc-${page}x${x.toFixed(2)}x${y.toFixed(2)}`;
+        const hash = window.location.hash;
+        const firstSep = hash.indexOf("-");
+        // console.log('jump label', window.location.hash, firstSep, globalSemaLabels);
+        if (firstSep != -1 && hash.slice(0, firstSep) === "#label") {
+          const labelTarget = hash.slice(firstSep + 1);
+          for (const [label, dom, pos] of globalSemaLabels) {
+            if (label === labelTarget) {
+              const [_, x, y] = pos;
+              // console.log('jump label', label, pos);
+              window.handleTypstLocation(dom, 1, x, y, {
+                behavior: initialRender ? "smooth" : "instant",
+              });
+              initialRender = false;
+              break;
+            }
+          }
+        }
+      }
     };
-    document.addEventListener("DOMContentLoaded", documentReady);
+
+    window.typstBindCustomSemantics = (root, svg, semantics) =>
+      setTimeout(() => typstBindCustomSemantics(root, svg, semantics), 0);
+
+    const baseHandleTypstLocation = window.handleTypstLocation;
+    window.handleTypstLocation = (elem, page, x, y, options) => {
+      const docRoot = findAncestor(elem, "typst-app");
+      if (!docRoot) {
+        console.warn("no typst-app found", elem);
+        return;
+      }
+
+      console.log(docRoot);
+      options = options || {};
+      options.isDom = true;
+
+      for (const h of docRoot.children) {
+        if (h.classList.contains("typst-dom-page")) {
+          const idx = Number.parseInt(h.getAttribute("data-index"));
+          if (idx + 1 === page) {
+            const svg = h.querySelector(".typst-svg-page");
+            if (svg) {
+              baseHandleTypstLocation(svg, page, x, y, options);
+            }
+            return;
+          }
+        }
+      }
+    };
+
+    window.assignSemaHash = (u, x, y) => {
+      // console.log(`find labels ${u}:${x}:${y} in`, globalSemaLabels);
+      for (const [label, dom, pos] of globalSemaLabels) {
+        const [u1, x1, y1] = pos;
+        if (u === u1 && Math.abs(x - x1) < 0.01 && Math.abs(y - y1) < 0.01) {
+          location.hash = `label-${label}`;
+          // const domX1 = x1 * dom.viewBox.baseVal.width;
+          // const domY1 = y1 * dom.viewBox.baseVal.height;
+
+          window
+            .typstCheckAndRerender?.(false, new Error("assignSemaHash"))
+            .then(() => {
+              const width = dom.viewBox.baseVal.width;
+              const height = dom.viewBox.baseVal.height;
+              const bbox = dom.getBoundingClientRect();
+              const domX1 = bbox.left + (x1 / width) * bbox.width;
+              const domY1 = bbox.top + (y1 / height) * bbox.height;
+
+              const lnk = findLinkInSvg(dom, [domX1, domY1]);
+              if (!lnk) {
+                return;
+              }
+              // const semaLinkLocation = document.getElementById(`typst-label-${label}`);
+              const relatedElems = window.typstGetRelatedElements(lnk);
+              for (const h of relatedElems) {
+                h.classList.add("focus");
+              }
+              updateHovers(relatedElems);
+              return;
+            });
+          return;
+        }
+      }
+      updateHovers([]);
+      // todo: multiple documents
+      location.hash = `loc-${u}x${x.toFixed(2)}x${y.toFixed(2)}`;
+    };
+
+    return new Promise((resolve) => {
+      plugin.runWithSession(
+        (ses) =>
+          new Promise((dispose) => {
+            // ignore dispose
+            void dispose;
+
+            session = ses;
+
+            const t = performance.now();
+            const dom = plugin.renderDom({
+              renderSession: ses,
+              container: appElem,
+              pixelPerPt: 2,
+              domScale: 1.5,
+            });
+
+            dom.then((dom) => {
+              console.log(dom);
+              dom.addChangement(["new", artifactData]);
+              console.log("render time!!!!!!!!!", performance.now() - t);
+
+              window.addEventListener("resize", () => dom.addViewportChange());
+              window.addEventListener("scroll", () => dom.addViewportChange());
+            });
+          })
+      );
+    });
+  };
+  document.addEventListener("DOMContentLoaded", documentReady);
 </script>
 
-<div id="typst-app-container">
-    <div id="typst-app"></div>
-</div>
-<style>
-    #typst-app-container {
-        border: 1px solid #000;
-        padding: 10px;
-        display: flex;
-        justify-content: center;
-    }
+<div id="typst-dyn-elem"></div>
+<style is:global>
+  .typst-dyn-elem {
+    --typst-dom-scale: 1.5;
+  }
+  .typst-dom-page {
+    width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
+    height: calc(var(--data-page-height) * var(--typst-dom-scale));
+    --data-text-width: calc(1px * var(--typst-dom-scale));
+    --data-text-height: calc(1px * var(--typst-dom-scale));
+    margin: auto;
+  }
 
-    #typst-app {
-        --typst-dom-scale: 1.5;
-        margin: 5px;
-    }
+  .typst-back-canvas {
+    position: absolute;
+    z-index: -1;
+    width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
+    height: calc(var(--data-page-height) * var(--typst-dom-scale));
+    pointer-events: none;
+  }
 
-    .typst-dom-page {
-        width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
-        height: calc(var(--data-page-height) * var(--typst-dom-scale));
-        --data-text-width: calc(1px * var(--typst-dom-scale));
-        --data-text-height: calc(1px * var(--typst-dom-scale));
-        margin: auto;
-    }
+  .typst-svg-page {
+    position: absolute;
+    z-index: 0;
+    width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
+    height: calc(var(--data-page-height) * var(--typst-dom-scale));
+  }
 
-    .typst-back-canvas {
-        position: absolute;
-        z-index: -1;
-        width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
-        height: calc(var(--data-page-height) * var(--typst-dom-scale));
-        pointer-events: none;
-    }
+  .typst-html-semantics {
+    position: absolute;
+    z-index: 2;
+    width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
+    height: calc(var(--data-page-height) * var(--typst-dom-scale));
+    color: transparent;
+    font-family: monospace;
+    white-space: pre;
+  }
 
-    .typst-svg-page {
-        position: absolute;
-        z-index: 0;
-        width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
-        height: calc(var(--data-page-height) * var(--typst-dom-scale));
-    }
+  .typst-html-semantics span {
+    transform-origin: left top;
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    top: 0;
+  }
 
-    .typst-html-semantics {
-        position: absolute;
-        z-index: 2;
-        width: calc(var(--data-page-width, 100%) * var(--typst-dom-scale));
-        height: calc(var(--data-page-height) * var(--typst-dom-scale));
-        color: transparent;
-        font-family: monospace;
-        white-space: pre;
-    }
+  .typst-content-hint {
+    position: absolute;
+    display: inline-block;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
 
-    .typst-html-semantics span {
-        transform-origin: left top;
-        position: absolute;
-        display: inline-block;
-        left: 0;
-        top: 0;
-    }
+  .typst-html-semantics a {
+    position: absolute;
+    display: inline-block;
+  }
 
-    .typst-content-hint {
-        position: absolute;
-        display: inline-block;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-    }
+  /* set transparent itself */
+  .typst-content-group {
+    pointer-events: visible;
+  }
 
-    .typst-html-semantics a {
-        position: absolute;
-        display: inline-block;
-    }
+  .typst-html-semantics span::-moz-selection {
+    color: transparent;
+    background: #7db9dea0;
+  }
 
-    /* set transparent itself */
-    .typst-content-group {
-        pointer-events: visible;
-    }
+  .typst-html-semantics span::selection {
+    color: transparent;
+    background: #7db9dea0;
+  }
 
-    .typst-html-semantics span::-moz-selection {
-        color: transparent;
-        background: #7db9dea0;
-    }
+  .typst-html-semantics *::-moz-selection {
+    color: transparent;
+    background: transparent;
+  }
 
-    .typst-html-semantics span::selection {
-        color: transparent;
-        background: #7db9dea0;
-    }
+  .typst-html-semantics *::selection {
+    color: transparent;
+    background: transparent;
+  }
 
-    .typst-html-semantics *::-moz-selection {
-        color: transparent;
-        background: transparent;
-    }
+  .typst-content-fallback {
+    color: transparent;
+    background: transparent;
+  }
 
-    .typst-html-semantics *::selection {
-        color: transparent;
-        background: transparent;
-    }
+  .pseudo-link,
+  .typst-text {
+    pointer-events: none;
+  }
 
-    .typst-content-fallback {
-        color: transparent;
-        background: transparent;
-    }
+  .typst-app {
+    margin: 0;
+  }
 
-    .pseudo-link,
-    .typst-text {
-        pointer-events: none;
-    }
+  .typst-page.canvas {
+    margin: 0;
+  }
 
-    .typst-app {
-        margin: 0;
-    }
+  .typst-html-semantics {
+    position: absolute;
+    z-index: 2;
+    color: transparent;
+    font-family: monospace;
+    white-space: pre;
+  }
 
-    .typst-page.canvas {
-        margin: 0;
-    }
+  .typst-html-semantics span {
+    transform-origin: left top;
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    top: 0;
+  }
 
-    .typst-html-semantics {
-        position: absolute;
-        z-index: 2;
-        color: transparent;
-        font-family: monospace;
-        white-space: pre;
-    }
+  .typst-content-hint {
+    position: absolute;
+    display: inline-block;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
 
-    .typst-html-semantics span {
-        transform-origin: left top;
-        position: absolute;
-        display: inline-block;
-        left: 0;
-        top: 0;
-    }
+  .typst-html-semantics a {
+    position: absolute;
+    display: inline-block;
+  }
 
-    .typst-content-hint {
-        position: absolute;
-        display: inline-block;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-    }
+  /* set transparent itself */
+  .typst-content-group {
+    pointer-events: visible;
+  }
 
-    .typst-html-semantics a {
-        position: absolute;
-        display: inline-block;
-    }
+  .typst-html-semantics span::-moz-selection {
+    color: transparent;
+    background: #7db9dea0;
+  }
 
-    /* set transparent itself */
-    .typst-content-group {
-        pointer-events: visible;
-    }
+  .typst-html-semantics span::selection {
+    color: transparent;
+    background: #7db9dea0;
+  }
 
-    .typst-html-semantics span::-moz-selection {
-        color: transparent;
-        background: #7db9dea0;
-    }
+  .typst-html-semantics *::-moz-selection {
+    color: transparent;
+    background: transparent;
+  }
 
-    .typst-html-semantics span::selection {
-        color: transparent;
-        background: #7db9dea0;
-    }
+  .typst-html-semantics *::selection {
+    color: transparent;
+    background: transparent;
+  }
 
-    .typst-html-semantics *::-moz-selection {
-        color: transparent;
-        background: transparent;
-    }
+  .typst-content-fallback {
+    color: transparent;
+    background: transparent;
+  }
 
-    .typst-html-semantics *::selection {
-        color: transparent;
-        background: transparent;
-    }
+  .pseudo-link,
+  .typst-text {
+    pointer-events: none;
+  }
 
-    .typst-content-fallback {
-        color: transparent;
-        background: transparent;
-    }
+  .typst-text {
+    pointer-events: bounding-box;
+  }
 
-    .pseudo-link,
-    .typst-text {
-        pointer-events: none;
-    }
+  .tsel span,
+  .tsel {
+    position: fixed;
+    text-align: justify;
+    white-space: pre;
+    width: 100%;
+    height: 100%;
+    text-align-last: justify;
+    color: transparent;
+  }
+  .tsel span::-moz-selection,
+  .tsel::-moz-selection {
+    color: transparent;
+    background: #7db9dea0;
+  }
+  .tsel span::selection,
+  .tsel::selection {
+    color: transparent;
+    background: #7db9dea0;
+  }
 
-    .typst-text {
-        pointer-events: bounding-box;
-    }
+  .pseudo-link {
+    fill: transparent;
+    cursor: pointer;
+    pointer-events: all;
+  }
+  .outline_glyph path,
+  path.outline_glyph {
+    transition: 0.2s fill stroke;
+  }
 
-    .tsel span,
-    .tsel {
-        position: fixed;
-        text-align: justify;
-        white-space: pre;
-        width: 100%;
-        height: 100%;
-        text-align-last: justify;
-        color: transparent;
-    }
-    .tsel span::-moz-selection,
-    .tsel::-moz-selection {
-        color: transparent;
-        background: #7db9dea0;
-    }
-    .tsel span::selection,
-    .tsel::selection {
-        color: transparent;
-        background: #7db9dea0;
-    }
+  .outline_glyph path,
+  path.outline_glyph {
+    fill: var(--glyph_fill);
+    stroke: var(--glyph_stroke);
+  }
 
-    .pseudo-link {
-        fill: transparent;
-        cursor: pointer;
-        pointer-events: all;
-    }
-    .outline_glyph path,
-    path.outline_glyph {
-        transition: 0.2s fill stroke;
-    }
+  .hover .typst-text {
+    --glyph_fill: #66bab7;
+    --glyph_stroke: #66bab7;
+  }
 
-    .outline_glyph path,
-    path.outline_glyph {
-        fill: var(--glyph_fill);
-        stroke: var(--glyph_stroke);
+  .typst-jump-ripple,
+  .typst-debug-react-ripple {
+    width: 0;
+    height: 0;
+    background-color: transparent;
+    position: absolute;
+    border-radius: 50%;
+  }
+  .typst-jump-ripple {
+    border: 1px solid #66bab7;
+  }
+  .typst-debug-react-ripple {
+    border: 1px solid #cb1b45;
+  }
+  @keyframes typst-jump-ripple-effect {
+    to {
+      width: 10vw;
+      height: 10vw;
+      opacity: 0.01;
+      margin: -5vw;
     }
-
-    .hover .typst-text {
-        --glyph_fill: #66bab7;
-        --glyph_stroke: #66bab7;
+  }
+  @keyframes typst-debug-react-ripple-effect {
+    to {
+      width: 3vw;
+      height: 3vw;
+      opacity: 0.01;
+      margin: -1.5vw;
     }
-
-    .typst-jump-ripple,
-    .typst-debug-react-ripple {
-        width: 0;
-        height: 0;
-        background-color: transparent;
-        position: absolute;
-        border-radius: 50%;
-    }
-    .typst-jump-ripple {
-        border: 1px solid #66bab7;
-    }
-    .typst-debug-react-ripple {
-        border: 1px solid #cb1b45;
-    }
-    @keyframes typst-jump-ripple-effect {
-        to {
-            width: 10vw;
-            height: 10vw;
-            opacity: 0.01;
-            margin: -5vw;
-        }
-    }
-    @keyframes typst-debug-react-ripple-effect {
-        to {
-            width: 3vw;
-            height: 3vw;
-            opacity: 0.01;
-            margin: -1.5vw;
-        }
-    }
+  }
 </style>

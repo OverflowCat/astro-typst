@@ -38,6 +38,7 @@ export default function typstIntegration(
         options: {
             remPx: 16
         },
+        body: true,
         target: defaultTarget,
     }
 ): AstroIntegration {
@@ -59,7 +60,7 @@ export default function typstIntegration(
                         let { getFrontmatter } = await renderToHTMLish(
                             {
                                 mainFilePath,
-                                body: true,
+                                body: config.body !== false,
                             },
                             config?.options,
                             isHtml
