@@ -4,6 +4,7 @@ import Typst from "../components/Typst.astro";
 import { TypstDocInput } from "../lib/prelude";
 import Simp from "./simp.typ";
 import SimpHtml from "./_simp-html.typ?html";
+import DynTypst from "../components/DynTypst.astro";
 
 const code = `
 // #set page(width: 15em, height: auto, margin: 1em)
@@ -25,6 +26,16 @@ const input: TypstDocInput = {
     "something": "from Astro!",
   }
 };
+
+const dynExample = `
+#let page-width = sys.inputs.at("x-page-width", default: 21cm)
+#stack(
+  dir: ltr,
+  spacing: 2em,
+  box(width: 35%)[#lorem(200)],
+  box(width: 55%)[#lorem(250)]
+)
+`
 
 const collections = await getCollection("typ");
 ---
@@ -69,6 +80,9 @@ const collections = await getCollection("typ");
       <Typst input={input} />
       <h2>5: <code>mainFilePath</code></h2>
       <Typst src={input.mainFilePath!} />
+      <h2>6: <code>DynTypst</code></h2>
+      <p>Work in progress</p>
+      <DynTypst code={dynExample} />
     </main>
   </body>
 </html>
