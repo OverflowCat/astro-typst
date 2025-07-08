@@ -1,5 +1,5 @@
 # build output
-dist/
+dist-demo/
 # generated types
 .astro/
 
@@ -27,6 +27,4 @@ pnpm-debug.log*
 
 public
 src/pages
-src/*.ts
-.astro
 .vscode

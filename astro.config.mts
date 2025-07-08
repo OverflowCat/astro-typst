@@ -17,6 +17,7 @@ const debug: AstroIntegration = {
 
 // https://astro.build/config
 export default defineConfig({
+    outDir: "dist-demo",
     integrations: [
         debug,
         typst({

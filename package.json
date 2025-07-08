@@ -1,7 +1,7 @@
 {
   "name": "astro-typst",
   "type": "module",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "packageManager": "pnpm@10.11.0",
   "repository": {
     "type": "git",
@@ -16,16 +16,17 @@
     "astro-component",
     "withastro"
   ],
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": {
     "name": "OverflowCat",
     "email": "overflowcat@gmail.com",
     "url": "https://overflow.cat"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "files": [
     "src",
+    "dist",
     "global.d.ts",
     "public"
   ],

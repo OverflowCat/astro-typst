@@ -1,5 +1,5 @@
 # build output
-dist/
+dist-demo/
 # generated types
 .astro/
 
@@ -27,11 +27,7 @@ pnpm-debug.log*
 .jj
 
 # project
-*.js
-*.js.map
-*.d.ts
-*.d.ts.map
-
+dist/
 **/test*.*
 
 !globals.d.ts
