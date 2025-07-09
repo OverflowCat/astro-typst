@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Typst from "../components/Typst.astro";
 import { TypstDocInput } from "../lib/prelude";
 import Simp from "./simp.typ";
+import SimpRaw from "./simp.typ?raw";
 import SimpHtml from "./_simp-html.typ?html";
 import DynTypst from "../components/DynTypst.astro";
 
@@ -77,6 +78,10 @@ const collections = await getCollection("typ");
         123
         <SimpHtml data={456} />
       </Simp>
+      <h3>2.1: In route</h3>
+      <a href="/simp">/simp</a>
+      <h3>2.2: <code>raw</code> content</h3>
+      <pre>{SimpRaw}</pre>
       <h2>3: <samp>simp.typ html</samp></h2>
       <SimpHtml test="haha" />
       <h2>4: <code>TypstDocInput</code></h2>

@@ -125,16 +125,22 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
             const code = `
 import { createComponent, render, renderJSX, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
 import { AstroJSX, jsx } from 'astro/jsx-runtime';
+import { readFileSync } from "node:fs";
 export const name = "TypstComponent";
 export const html = ${JSON.stringify(html)};
 export const frontmatter = ${JSON.stringify(getFrontmatter())};
 export const file = ${JSON.stringify(mainFilePath)};
 export const url = ${JSON.stringify(pathToFileURL(mainFilePath))};
 export function rawContent() {
-    return ${JSON.stringify(await fs.readFile(mainFilePath, 'utf-8'))};
+    return readFileSync(${
+        JSON.stringify(mainFilePath) // SSR?
+    }, 'utf-8');
 }
 export function compiledContent() {
-    return ${JSON.stringify(html)};
+    return ${
+        // since Astro v5, function `compiledContent` is an async function
+        JSON.stringify(html)
+    };
 }
 export function getHeadings() {
     return undefined;
