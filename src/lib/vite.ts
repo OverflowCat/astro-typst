@@ -85,6 +85,7 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
             let { html, getFrontmatter } = await renderToHTMLish(
                 {
                     mainFilePath,
+                    // TODO: remove body; autodetect after the render process is delayed
                     body: emitSvg ? true : isBody,
                 },
                 config.options,
@@ -122,7 +123,8 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
             }
 
             const code = `
-import { createComponent, render, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
+import { createComponent, render, renderJSX, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
+import { AstroJSX, jsx } from 'astro/jsx-runtime';
 export const name = "TypstComponent";
 export const html = ${JSON.stringify(html)};
 export const frontmatter = ${JSON.stringify(getFrontmatter())};
@@ -138,10 +140,20 @@ export function getHeadings() {
     return undefined;
 }
 
-export const Content = createComponent((result, _props, slots) => {
+export const Content = createComponent(async (result, _props, slots) => {
     const { layout, ...content } = frontmatter;
+    const slot = await slots?.default?.();
     content.file = file;
     content.url = url;
+    const html = await renderJSX(result, jsx("div", { ..._props, ...slots,  }));
+    console.log("========={content}==========");
+    console.log( {
+        result,
+        _props,
+        slot,
+        html,
+        //        ex: await slot?.expressions?.at(0)?.render()
+    })
     // return render\`\${compiledContent()}\`;
     return render\`\${unescapeHTML(compiledContent())}\`;
 });

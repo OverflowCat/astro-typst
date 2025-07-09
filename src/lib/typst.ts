@@ -37,7 +37,7 @@ function getInitOptions(): CompileArgs {
     return initOptions;
 }
 
-function initCompiler(): NodeCompiler { 
+function initCompiler(): NodeCompiler {
     return NodeCompiler.create(getInitOptions());
 }
 
@@ -148,7 +148,42 @@ export async function renderToDynamicLayout(
     return res;
 }
 
+/**
+ * @param source The source code of the .typ file.
+ * @param options Options for rendering the HTML.
+ * @returns The HTML string.
+ */
 export async function renderToHTML(
+    source: TypstDocInput & { body?: boolean | "hast" },
+    options: any,
+) {
+    const onlyBody = source.body;
+    source = prepareSource(source, options);
+    const $typst = getOrInitCompiler();
+    const docRes = $typst.compileHtml(source);
+    if (!docRes.result) {
+        logger.error("Error compiling typst to HTML");
+        docRes.printDiagnostics();
+        return { html: "" };
+    }
+    const doc = docRes.result;
+    const html = $typst.tryHtml(doc);
+    if (!html.result) {
+        html.printDiagnostics();
+        return { html: "" };
+    }
+    return {
+        html:
+            onlyBody === "hast" ?
+                html.result.hast() :
+            onlyBody !== false ?
+                html.result.body() :
+                html.result.html(),
+        frontmatter: () => getFrontmatter($typst, doc),
+    };
+}
+
+export async function renderToHast(
     source: TypstDocInput & { body?: boolean },
     options: any,
 ) {
@@ -168,10 +203,7 @@ export async function renderToHTML(
         return { html: "" };
     }
     return {
-        html:
-            onlyBody ?
-                html.result.body() :
-                html.result.html(),
+        html: html.result.hast(),
         frontmatter: () => getFrontmatter($typst, doc),
     };
 }

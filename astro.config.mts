@@ -24,7 +24,6 @@ export default defineConfig({
             options: {
                 remPx: 14
             },
-            body: true,
             target: (id: string) => {
                 console.debug(`Detecting ${id}`);
                 if (id.endsWith('.html.typ') || id.includes('/html/'))
