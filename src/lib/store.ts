@@ -1,3 +1,4 @@
+import type { AstroConfig } from "astro";
 import type { AstroTypstConfig } from "./prelude";
 
 export function setConfig(config: AstroTypstConfig) {
@@ -10,4 +11,16 @@ export function getConfig() {
         throw new Error("Config not set");
     }
     return c as AstroTypstConfig;
+}
+
+export function setAstroConfig(config: AstroConfig) {
+    (global as any)._astroConfig = config;
+}
+
+export function getAstroConfig() {
+    const c = (global as any)._astroConfig;
+    if (!c) {
+        throw new Error("Config not set");
+    }
+    return c as AstroConfig;
 }

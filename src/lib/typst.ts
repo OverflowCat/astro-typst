@@ -176,9 +176,9 @@ export async function renderToHTML(
         html:
             onlyBody === "hast" ?
                 html.result.hast() :
-            onlyBody !== false ?
-                html.result.body() :
-                html.result.html(),
+                onlyBody !== false ?
+                    html.result.body() :
+                    html.result.html(),
         frontmatter: () => getFrontmatter($typst, doc),
     };
 }
@@ -210,17 +210,15 @@ export async function renderToHast(
 
 
 export async function renderToHTMLish(
-    source: TypstDocInput & { body?: boolean },
+    source: TypstDocInput & { body?: boolean | "hast" },
     options: any,
     isHtml: boolean = true,
 ) {
     var html: string;
     var getFrontmatter = () => ({});
     if (isHtml) {
-        source.body = options.body !== false;
         let { html: htmlRes, frontmatter } = await renderToHTML(
-            source,
-            options
+            source, options
         );
         html = htmlRes;
         getFrontmatter = frontmatter || (() => ({}));

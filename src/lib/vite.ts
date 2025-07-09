@@ -3,9 +3,11 @@ import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTMLish } from "./typst.js";
 import { pathToFileURL } from "node:url";
 import { detectTarget, type AstroTypstConfig } from "./prelude.js";
+import { rehypeIt } from "./rehype.js";
 import logger from "./logger.js";
 import path from "node:path/posix";
 import type { AstroConfig } from "astro";
+import { getAstroConfig } from "./store.js";
 
 function isTypstFile(id: string) {
     return /\.typ(\?(html|svg|html&body|body&html))?$/.test(id);
@@ -26,7 +28,8 @@ function debug(...args: any[]) {
     }
 }
 
-export default function (config: AstroTypstConfig, options: AstroConfig): Plugin {
+export default function (config: AstroTypstConfig): Plugin {
+    const astroConfig = getAstroConfig();
     let server: ViteDevServer;
     const plugin: Plugin = {
         name: 'vite-plugin-astro-typ',
@@ -65,13 +68,11 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
             });
         },
 
-
         async transform(_: string, id: string) {
             if (!isTypstFile(id)) return;
             const { path: mainFilePath, opts } = extractOpts(id);
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
-            const isBody = opts.includes('body');
             let isHtml = false;
             if (opts.includes('svg') || opts.includes("img")) {
                 isHtml = false;
@@ -86,19 +87,20 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
                 {
                     mainFilePath,
                     // TODO: remove body; autodetect after the render process is delayed
-                    body: emitSvg ? true : isBody,
+                    body: "hast",
                 },
                 config.options,
                 isHtml
             );
 
+            // emitSvg: put svg to public dir and inline it as a base64 string (dev) / img (prod)
             if (emitSvg && !isHtml) {
                 let imgSvg = "";
                 const contentHash = crypto.randomUUID().slice(0, 8);
                 const fileName = `typst-${contentHash}.svg`;
 
                 const emitSvgDir = config.emitSvgDir ?? "typst";
-                const base = options.base ?? "/";
+                const base = astroConfig.base ?? "/";
                 let publicUrl = path.join(base, emitSvgDir, fileName);
                 logger.debug({
                     base,
@@ -120,6 +122,11 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
                     imgSvg = `<img src="data:image/svg+xml;base64,${Buffer.from(html, 'utf-8').toString('base64')}" />`;
                 }
                 html = imgSvg;
+            } else if (isHtml) { // output is actually hast
+                if (typeof html === 'string') {
+                    throw new Error("html is a string, but it should be a hast object");
+                }
+                html = await rehypeIt(html, astroConfig.markdown?.rehypePlugins ?? []);
             }
 
             const code = `
@@ -132,15 +139,14 @@ export const frontmatter = ${JSON.stringify(getFrontmatter())};
 export const file = ${JSON.stringify(mainFilePath)};
 export const url = ${JSON.stringify(pathToFileURL(mainFilePath))};
 export function rawContent() {
-    return readFileSync(${
-        JSON.stringify(mainFilePath) // SSR?
-    }, 'utf-8');
+    return readFileSync(${JSON.stringify(mainFilePath) // SSR?
+                }, 'utf-8');
 }
 export function compiledContent() {
     return ${
-        // since Astro v5, function `compiledContent` is an async function
-        JSON.stringify(html)
-    };
+                // since Astro v5, function `compiledContent` is an async function
+                JSON.stringify(html)
+                };
 }
 export function getHeadings() {
     return undefined;
@@ -152,13 +158,11 @@ export const Content = createComponent(async (result, _props, slots) => {
     content.file = file;
     content.url = url;
     const html = await renderJSX(result, jsx("div", { ..._props, ...slots,  }));
-    console.log("========={content}==========");
     console.log( {
         result,
         _props,
         slot,
         html,
-        //        ex: await slot?.expressions?.at(0)?.render()
     })
     // return render\`\${compiledContent()}\`;
     return render\`\${unescapeHTML(compiledContent())}\`;

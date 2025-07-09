@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
 import { createResolver, watchDirectory } from "astro-integration-kit";
 import { defaultTarget, detectTarget, type AstroTypstConfig } from "./prelude.js";
-import { setConfig } from "./store.js";
+import { setAstroConfig, setConfig } from "./store.js";
 import logger from "./logger.js";
 
 const PACKAGE_NAME = 'astro-typst';
@@ -47,6 +47,7 @@ export default function typstIntegration(
         hooks: {
             "astro:config:setup": (options) => {
                 setConfig(config);
+                setAstroConfig(options.config);
                 const {
                     addRenderer, addContentEntryType, addPageExtension, updateConfig
                 } = (options as SetupHookParams);
@@ -96,13 +97,13 @@ declare module 'astro:content' {
                             }
                         },
                         // @ts-ignore
-                        plugins: [nodeResolve(), vitePluginTypst(config, options) as PluginOption],
+                        plugins: [nodeResolve(), vitePluginTypst(config) as PluginOption],
                     },
                 });
             },
 
-            "astro:config:done": (params) => {
-                params.injectTypes(
+            "astro:config:done": ({ config, injectTypes }) => {
+                injectTypes(
                     {
                         filename: "astro-i18n.d.ts",
                         content: `declare module '*.typ' {
@@ -111,6 +112,7 @@ declare module 'astro:content' {
 }`,
                     }
                 )
+                setAstroConfig(config);
             }
         }
     }

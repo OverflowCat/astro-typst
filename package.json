@@ -46,7 +46,9 @@
     "@overflowcat/typst-ts-node-compiler-darwin-arm64": "0.6.1-rc116",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "astro-integration-kit": "^0.18.0",
-    "cheerio": "^1.1.0"
+    "cheerio": "^1.1.0",
+    "rehype-stringify": "^10.0.1",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
