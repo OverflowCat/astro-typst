@@ -22,7 +22,7 @@ function extractOpts(id: string) {
 }
 function debug(...args: any[]) {
     if (process.env.DEBUG) {
-        debug(...args);
+        console.debug(...args);
     }
 }
 

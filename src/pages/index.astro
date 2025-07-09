@@ -73,16 +73,19 @@ const collections = await getCollection("typ");
       </h3>
       <!-- <Typst code={code} width={"100%"} height={"auto"} /> -->
       <h2>2: <samp>simp.typ</samp></h2>
-      <Simp />
+      <Simp>
+        123
+        <SimpHtml data={456} />
+      </Simp>
       <h2>3: <samp>simp.typ html</samp></h2>
-      <SimpHtml />
+      <SimpHtml test="haha" />
       <h2>4: <code>TypstDocInput</code></h2>
       <Typst input={input} />
       <h2>5: <code>mainFilePath</code></h2>
       <Typst src={input.mainFilePath!} />
       <h2>6: <code>DynTypst</code></h2>
       <p>Work in progress</p>
-      <DynTypst code={dynExample} />
+      <!-- <DynTypst code={dynExample} /> -->
     </main>
   </body>
 </html>

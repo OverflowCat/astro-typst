@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import type { PluginOption } from "vite";
 import { createResolver, watchDirectory } from "astro-integration-kit";
 import { defaultTarget, detectTarget, type AstroTypstConfig } from "./prelude.js";
-import { getConfig, setConfig } from "./store.js";
+import { setConfig } from "./store.js";
 import logger from "./logger.js";
 
 const PACKAGE_NAME = 'astro-typst';
@@ -90,7 +90,7 @@ declare module 'astro:content' {
                 });
                 updateConfig({
                     vite: {
-                        build: {
+                                                build: {
                             rollupOptions: {
                                 external: [
                                     "@myriaddreamin/typst-ts-node-compiler",

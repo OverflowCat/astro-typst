@@ -41,9 +41,9 @@ let input: TypstDocInput =
       ? options.code
       : options.input;
 
-console.info({ input, options });
+// console.info({ input, options });
 const vectorArtifact = await renderToDynamicLayout(input, options);
-console.info({ vectorArtifact, length: vectorArtifact.length });
+// console.info({ vectorArtifact, length: vectorArtifact.length });
 ---
 
 <script is:inline define:vars={{ vectorArtifact }}>

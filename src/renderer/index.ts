@@ -2,7 +2,7 @@ import type { NamedSSRLoadedRendererValue } from "astro";
 import type { TypstComponent } from "../lib/prelude";
 import { AstroError } from "astro/errors";
 
-async function check(
+export async function check(
     t: any,
     _Component: any,
     _props: Record<string, any>,
