@@ -31,3 +31,5 @@ dist/
 **/test*.*
 
 !globals.d.ts
+
+*.pdf

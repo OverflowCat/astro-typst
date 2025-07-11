@@ -1,7 +1,7 @@
 {
   "name": "astro-typst",
   "type": "module",
-  "version": "0.11.0",
+  "version": "0.0.0-hast-test-2",
   "packageManager": "pnpm@10.11.0",
   "repository": {
     "type": "git",
@@ -37,17 +37,14 @@
     "compile": "tsc",
     "preview": "astro preview",
     "pub": "pnpm compile && pnpm publish --no-git-checks",
+    "pb": "pnpm compile && pnpm publish --no-git-checks --tag beta",
     "astro": "astro"
   },
   "dependencies": {
-    "@myriaddreamin/typst-ts-renderer": "0.6.0",
-    "@myriaddreamin/typst.ts": "0.6.0",
-    "@overflowcat/typst-ts-node-compiler": "0.6.1-rc116",
-    "@overflowcat/typst-ts-node-compiler-darwin-arm64": "0.6.1-rc116",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "astro-integration-kit": "^0.18.0",
-    "cheerio": "^1.1.0",
     "rehype-stringify": "^10.0.1",
+    "typstx": "0.0.1-alpha.2",
     "unified": "^11.0.5"
   },
   "devDependencies": {
@@ -58,6 +55,11 @@
     "vite": "^6.3.5"
   },
   "peerDependencies": {
-    "astro": ">= 3.0.0"
+    "@myriaddreamin/typst-ts-renderer": "0.6.0",
+    "@myriaddreamin/typst.ts": "0.6.0",
+    "@overflowcat/typst-ts-node-compiler": "0.6.1-rc116",
+    "@overflowcat/typst-ts-node-compiler-darwin-arm64": "0.6.1-rc116",
+    "astro": ">= 3.0.0",
+    "cheerio": ">=1.0.0 <2.0.0"
   }
 }

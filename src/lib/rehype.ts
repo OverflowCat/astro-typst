@@ -1,6 +1,9 @@
 import type { RehypePlugins } from "astro";
 import { unified, type Parser } from "unified";
 import stringify from "rehype-stringify";
+// @ts-ignore
+import { createProcessor } from "typstx";
+import { getOrInitCompiler } from "./typst";
 
 export async function rehypeIt(hast: any, rehypePipe: RehypePlugins) {
   function typParse() {
@@ -21,4 +24,14 @@ export async function rehypeIt(hast: any, rehypePipe: RehypePlugins) {
   processor = processor.use(stringify);
   const html = (await processor.process()).toString();
   return html;
+}
+
+export async function rehypeTypstx(hast: any, rehypePipe: RehypePlugins) {
+  const processor = createProcessor({
+    jsxImportSource: "astro",
+    rehypePlugins: rehypePipe,
+  }, getOrInitCompiler);
+  processor.__setHast(hast);
+  const html = await processor.process(hast);
+  return html.value;
 }

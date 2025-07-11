@@ -41,11 +41,11 @@ function initCompiler(): NodeCompiler {
     return NodeCompiler.create(getInitOptions());
 }
 
-function getOrInitCompiler(): NodeCompiler {
+export function getOrInitCompiler(): NodeCompiler {
     return (compilerIns ||= initCompiler());
 }
 
-function getOrInitDynCompiler(): DynLayoutCompiler {
+export function getOrInitDynCompiler(): DynLayoutCompiler {
     return (dynCompilerIns ||= DynLayoutCompiler.fromBoxed(
         NodeCompiler.create(getInitOptions()).intoBoxed())
     );

@@ -1,0 +1,28 @@
+---
+export type Props = {
+  initialCount: number;
+};
+
+const { initialCount } = Astro.props;
+
+let count = initialCount;
+---
+
+<div>
+  <h3>Counter</h3>
+  <p id="count">{count}</p>
+  <button id="increment">Increment</button>
+  <button id="jueqi">Jueqi</button>
+</div>
+
+<script>
+  const button = document.querySelector("button");
+  const p = document.querySelector("p#count");
+  button?.addEventListener("click", () => {
+    p!.textContent = (parseInt(p!.textContent!) + 1).toString();
+  });
+  const jueqiButton = document.querySelector("button#jueqi");
+  jueqiButton?.addEventListener("click", () => {
+    alert("Typst 已经崛起了！");
+  });
+</script>

@@ -18,7 +18,7 @@ function getRenderer(): AstroRenderer {
 \x1b[32mThis mode is good for test, debug, and build the demo site.\x1b[0m
 Server entry point: ${serverEntrypoint}`);
     return {
-        name: PACKAGE_NAME,
+        name: "astro:jsx",
         serverEntrypoint,
     };
 }

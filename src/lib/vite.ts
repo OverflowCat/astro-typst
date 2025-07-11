@@ -3,10 +3,9 @@ import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTMLish } from "./typst.js";
 import { pathToFileURL } from "node:url";
 import { detectTarget, type AstroTypstConfig } from "./prelude.js";
-import { rehypeIt } from "./rehype.js";
+import { rehypeTypstx } from "./rehype.js";
 import logger from "./logger.js";
 import path from "node:path/posix";
-import type { AstroConfig } from "astro";
 import { getAstroConfig } from "./store.js";
 
 function isTypstFile(id: string) {
@@ -31,15 +30,10 @@ function debug(...args: any[]) {
 export default function (config: AstroTypstConfig): Plugin {
     const astroConfig = getAstroConfig();
     let server: ViteDevServer;
+    const VITE_PLUGIN_NAME = 'vite-plugin-astro-typ';
     const plugin: Plugin = {
-        name: 'vite-plugin-astro-typ',
+        name: VITE_PLUGIN_NAME,
         enforce: 'pre',
-
-        // resolveId(source, importer, options) {
-        //     if (!isTypstFile(source)) return null;
-        //     const { path, opts } = extractOpts(source);
-        //     console.log(`'${path}' is imported by '${importer}'`);
-        // },
 
         load(id) {
             if (!isTypstFile(id)) return;
@@ -126,10 +120,10 @@ export default function (config: AstroTypstConfig): Plugin {
                 if (typeof html === 'string') {
                     throw new Error("html is a string, but it should be a hast object");
                 }
-                html = await rehypeIt(html, astroConfig.markdown?.rehypePlugins ?? []);
+                html = await rehypeTypstx(html, astroConfig.markdown?.rehypePlugins ?? []);
             }
 
-            const code = `
+            const code = isHtml ? html : `
 import { createComponent, render, renderJSX, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
 import { AstroJSX, jsx } from 'astro/jsx-runtime';
 import { readFileSync } from "node:fs";
@@ -139,8 +133,7 @@ export const frontmatter = ${JSON.stringify(getFrontmatter())};
 export const file = ${JSON.stringify(mainFilePath)};
 export const url = ${JSON.stringify(pathToFileURL(mainFilePath))};
 export function rawContent() {
-    return readFileSync(${JSON.stringify(mainFilePath) // SSR?
-                }, 'utf-8');
+    return readFileSync(file, 'utf-8');
 }
 export function compiledContent() {
     return ${
@@ -151,26 +144,17 @@ export function compiledContent() {
 export function getHeadings() {
     return undefined;
 }
-
 export const Content = createComponent(async (result, _props, slots) => {
     const { layout, ...content } = frontmatter;
     const slot = await slots?.default?.();
     content.file = file;
     content.url = url;
-    const html = await renderJSX(result, jsx("div", { ..._props, ...slots,  }));
-    console.log( {
-        result,
-        _props,
-        slot,
-        html,
-    })
     // return render\`\${compiledContent()}\`;
     return render\`\${unescapeHTML(compiledContent())}\`;
 });
 
 export default Content;
 `
-
             return {
                 code,
                 map: null,

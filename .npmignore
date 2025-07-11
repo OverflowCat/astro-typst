@@ -28,3 +28,5 @@ pnpm-debug.log*
 public
 src/pages
 .vscode
+
+*.pdf
