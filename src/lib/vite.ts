@@ -119,7 +119,7 @@ import { createComponent, render, renderComponent, unescapeHTML } from "astro/ru
 import { pathToFileURL } from "node:url";
 import * as path from "node:path";
 import crypto from "node:crypto";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { renderToHTML, renderToSVGString } from "astro-typst/runtime";
 const docArgs = ${docArgs};
 // todo: will getFrontmatter be always used in most cases?
@@ -164,7 +164,7 @@ export const Content = createComponent((result, props, slots) => {
         const base = ${JSON.stringify(options.base ?? "/")};
         let publicUrl = path.join(base, emitSvgDir, fileName);
 
-        if (import.meta.env.PROD) { // 'build' mode
+        if (false) { // 'build' mode: import.meta.env.PROD
             const emitName = path.join(emitSvgDir, fileName);
             const respId = this.emitFile({
                 type: 'asset',
