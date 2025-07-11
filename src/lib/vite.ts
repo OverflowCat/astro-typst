@@ -1,11 +1,12 @@
-import fs from "fs/promises";
 import { type Plugin, type ViteDevServer } from "vite";
-import { renderToHTMLish } from "./typst.js";
-import { pathToFileURL } from "node:url";
+import { setCheerio as compilerSetCheerio } from "./typst.js";
 import { detectTarget, type AstroTypstConfig } from "./prelude.js";
-import logger from "./logger.js";
-import path from "node:path/posix";
 import type { AstroConfig } from "astro";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 function isTypstFile(id: string) {
     return /\.typ(\?(html|svg|html&body|body&html))?$/.test(id);
@@ -28,9 +29,39 @@ function debug(...args: any[]) {
 
 export default function (config: AstroTypstConfig, options: AstroConfig): Plugin {
     let server: ViteDevServer;
+
+    // Extracts `cheerio` which is not serializable.
+    const compileConfig = { ...config.options };
+    if (compileConfig?.cheerio) {
+        compilerSetCheerio(compileConfig.cheerio);
+        delete compileConfig.cheerio;
+    }
+    // Serialize the compileConfig to JSON.
+    const compileConfigString = JSON.stringify(compileConfig);
+
     const plugin: Plugin = {
         name: 'vite-plugin-astro-typ',
         enforce: 'pre',
+
+        // Resolves `astro-typst/runtime` statically, so that we 
+        // can use it in typst components reliably.
+        config(config, env) {
+
+            config.resolve ||= {};
+            config.resolve.alias ||= {};
+
+            if (config.resolve.alias instanceof Array) {
+                config.resolve.alias = [
+                    ...config.resolve.alias,
+                    {
+                        find: 'astro-typst/runtime',
+                        replacement: resolve(__dirname, 'typst.js'),
+                    },
+                ];
+            } else {
+                config.resolve.alias['astro-typst/runtime'] = resolve(__dirname, 'typst.js');
+            }
+        },
 
         // resolveId(source, importer, options) {
         //     if (!isTypstFile(source)) return null;
@@ -50,10 +81,10 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
                 if (isTypstFile(filePath)) {
                     const modules = server.moduleGraph.getModulesByFile(filePath);
                     if (modules) {
-                        for (const mod of modules) {
+                        modules.forEach(mod => {
                             debug(`[vite-plugin-astro-typ] Invalidating module: ${mod.id}`);
                             server.moduleGraph.invalidateModule(mod);
-                        }
+                        })
                     } else {
                         debug(`[vite-plugin-astro-typ] No modules found for file: ${filePath}`);
                         server.ws.send({
@@ -82,68 +113,72 @@ export default function (config: AstroTypstConfig, options: AstroConfig): Plugin
             }
             let emitSvg = opts.includes('img') || config?.emitSvg === true;
 
-            let { html, getFrontmatter } = await renderToHTMLish(
-                {
-                    mainFilePath,
-                    body: emitSvg ? true : isBody,
-                },
-                config.options,
-                isHtml
-            );
-
-            if (emitSvg && !isHtml) {
-                let imgSvg = "";
-                const contentHash = crypto.randomUUID().slice(0, 8);
-                const fileName = `typst-${contentHash}.svg`;
-
-                const emitSvgDir = config.emitSvgDir ?? "typst";
-                const base = options.base ?? "/";
-                let publicUrl = path.join(base, emitSvgDir, fileName);
-                logger.debug({
-                    base,
-                    emitSvgDir,
-                    fileName,
-                    publicUrl,
-                })
-
-                if (import.meta.env.PROD) { // 'build' mode
-                    const emitName = path.join(emitSvgDir, fileName);
-                    const respId = this.emitFile({
-                        type: 'asset',
-                        fileName: emitName,
-                        source: Buffer.from(html, 'utf-8'),
-                    });
-                    logger.debug("emitFile", respId)
-                    imgSvg = `<img src='${publicUrl}' />`;
-                } else { // 'serve' mode inlines svg as base64
-                    imgSvg = `<img src="data:image/svg+xml;base64,${Buffer.from(html, 'utf-8').toString('base64')}" />`;
-                }
-                html = imgSvg;
-            }
-
+            const docArgs = JSON.stringify({ mainFilePath, body: emitSvg ? true : isBody });
             const code = `
 import { createComponent, render, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
+import { pathToFileURL } from "node:url";
+import * as path from "node:path";
+import crypto from "node:crypto";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { renderToHTML, renderToSVGString } from "astro-typst/runtime";
+const docArgs = ${docArgs};
+// todo: will getFrontmatter be always used in most cases?
+const { html: htmlDoc, svg, frontmatter: getFrontmatter } = await ${isHtml ? "renderToHTML" : "renderToSVGString"}(
+    docArgs,
+    ${compileConfigString},
+);
+
 export const name = "TypstComponent";
-export const html = ${JSON.stringify(html)};
-export const frontmatter = ${JSON.stringify(getFrontmatter())};
-export const file = ${JSON.stringify(mainFilePath)};
-export const url = ${JSON.stringify(pathToFileURL(mainFilePath))};
-export function rawContent() {
-    return ${JSON.stringify(await fs.readFile(mainFilePath, 'utf-8'))};
+let bodyCache = undefined;
+let htmlCache = undefined;
+const getHtml = (body) => {
+  if (!htmlDoc) { return ""; }
+  return body ?
+    (bodyCache === undefined ? (bodyCache = htmlDoc.body()) : bodyCache) :
+    (htmlCache === undefined ? (htmlCache = htmlDoc.html()) : htmlCache);
 }
-export function compiledContent() {
-    return ${JSON.stringify(html)};
+
+export const frontmatter = getFrontmatter();
+export const file = docArgs.mainFilePath;
+export const url = pathToFileURL(file);
+
+export function rawContent() {
+    return readFileSync(file, 'utf-8');
 }
 export function getHeadings() {
     return undefined;
 }
 
-export const Content = createComponent((result, _props, slots) => {
+export const Content = createComponent((result, props, slots) => {
     const { layout, ...content } = frontmatter;
     content.file = file;
     content.url = url;
-    // return render\`\${compiledContent()}\`;
-    return render\`\${unescapeHTML(compiledContent())}\`;
+    let toRender = ${isHtml ? "getHtml(props?.body || docArgs.body)" : "svg"};
+
+    if (${emitSvg && !isHtml}) {
+        let imgSvg = "";
+        const contentHash = crypto.randomUUID().slice(0, 8);
+        const fileName = \`typst-\${contentHash}.svg\`;
+
+        const emitSvgDir = ${JSON.stringify(config.emitSvgDir ?? "typst")};
+        const base = ${JSON.stringify(options.base ?? "/")};
+        let publicUrl = path.join(base, emitSvgDir, fileName);
+
+        if (false) { // 'build' mode: import.meta.env.PROD
+            const emitName = path.join(emitSvgDir, fileName);
+            const respId = this.emitFile({
+                type: 'asset',
+                fileName: emitName,
+                source: Buffer.from(toRender, 'utf-8'),
+            });
+            imgSvg = \`<img src='\${publicUrl}' />\`;
+        } else { // 'serve' mode inlines svg as base64
+            imgSvg = \`<img src="data:image/svg+xml;base64,\${Buffer.from(toRender, 'utf-8').toString('base64')}" />\`;
+        }
+        toRender = imgSvg;
+    }
+
+    return render(toRender);
 });
 
 export default Content;

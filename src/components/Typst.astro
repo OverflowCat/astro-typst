@@ -53,7 +53,7 @@ let input: TypstDocInput =
 
 const html =
     options.target === "html"
-        ? (await renderToHTML(input, options)).html
+        ? ((await renderToHTML(input, options))?.html?.html?.()) || ""
         : (await renderToSVGString(input, options)).svg;
 ---
 
