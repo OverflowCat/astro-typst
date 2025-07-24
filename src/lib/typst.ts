@@ -183,6 +183,9 @@ export async function renderToHTML(
     };
 }
 
+/** 
+ * @deprecated Need to be removed
+ */
 export async function renderToHast(
     source: TypstDocInput & { body?: boolean },
     options: any,

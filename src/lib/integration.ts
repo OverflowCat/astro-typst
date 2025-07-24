@@ -105,7 +105,7 @@ declare module 'astro:content' {
             "astro:config:done": ({ config, injectTypes }) => {
                 injectTypes(
                     {
-                        filename: "astro-i18n.d.ts",
+                        filename: "astro-typst.d.ts",
                         content: `declare module '*.typ' {
     const component: () => any;
     export default component;
