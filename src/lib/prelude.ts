@@ -1,4 +1,4 @@
-import type { CompileArgs, CompileDocArgs } from "@overflowcat/typst-ts-node-compiler";
+import type { CompileArgs, CompileDocArgs } from "@myriaddreamin/typst-ts-node-compiler";
 import type { CheerioAPI } from "cheerio";
 
 

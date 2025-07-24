@@ -1,4 +1,4 @@
-import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument, type CompileArgs } from "@overflowcat/typst-ts-node-compiler";
+import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument, type CompileArgs } from "@myriaddreamin/typst-ts-node-compiler";
 // import TypstTsCompiler from "@myriaddreamin/typst-ts-node-compiler";
 // console.log({TypstTsCompiler});
 // const { NodeCompiler, DynLayoutCompiler, } = TypstTsCompiler;
