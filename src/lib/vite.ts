@@ -123,7 +123,7 @@ export default function (config: AstroTypstConfig): Plugin {
                 html = await rehypeTypstx(html, astroConfig.markdown?.rehypePlugins ?? []);
             }
 
-            const code = isHtml ? html : `
+            const code = isHtml ? html + "\nexport const Content = MDXContent" : `
 import { createComponent, render, renderJSX, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
 import { AstroJSX, jsx } from 'astro/jsx-runtime';
 import { readFileSync } from "node:fs";
