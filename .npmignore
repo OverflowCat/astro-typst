@@ -12,7 +12,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
 # environment variables
 .env
 .env.production
@@ -25,6 +24,10 @@ pnpm-debug.log*
 
 **/test*.*
 *.typ.js
+
+# only for demo
+src/components/Counter.astro
+src/components/*.tsx
 
 public
 src/pages

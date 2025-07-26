@@ -1,0 +1,56 @@
+---
+import JsxDemo from "./_jsx.typ?html";
+import jsxDemoCode from "./_jsx.typ?raw";
+import counterCode from "../components/Counter.astro?raw";
+import ConfettiBtn from "../components/ConfettiBtn";
+import confettiBtnCode from "../components/ConfettiBtn.tsx?raw";
+import { Code } from "astro-expressive-code/components";
+---
+
+<section>
+  <h3>Astro</h3>
+  <JsxDemo />
+  <details>
+    <summary>Source code</summary>
+    <Code
+      title="_jsx.typ"
+      lang="typst"
+      code={jsxDemoCode}
+      mark={[1, "#jsx"]}
+    />
+    <Code
+      title="../components/Counter.astro"
+      lang="astro"
+      code={counterCode}
+    />
+  </details>
+  <h3>React</h3>
+  <ConfettiBtn client:only />
+  <details>
+    <summary>Source code</summary>
+    <Code
+      title="example.astro"
+      lang="tsx"
+      code={`---
+import ConfettiBtn from "../components/ConfettiBtn.tsx";
+---
+<ConfettiBtn client:only />`}
+      mark="client:only"
+    />
+    <Code
+      title="components/ConfettiBtn.tsx"
+      lang="tsx"
+      code={confettiBtnCode}
+    />
+  </details>
+</section>
+
+<style>
+  details {
+    margin-block-start: 1em;
+  }
+
+  section {
+    max-inline-size: 80ch;
+  }
+</style>

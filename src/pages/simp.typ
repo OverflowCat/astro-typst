@@ -7,7 +7,7 @@
 }
 
 #let render = () => [
-  + 天地，无恙乎？
+  + Hello, typst!
 ]
 
 #repeat(10, render)

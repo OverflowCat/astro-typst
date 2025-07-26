@@ -234,7 +234,10 @@ yields
 
 ### Internal links
 
-Add the following snippet to your page:
+Import `Jump.astro`, or add the following snippet to your page
+
+<details>
+<summary> Snippet </summary>
 
 ```js
 /**
@@ -291,6 +294,8 @@ window.handleTypstLocation = function (elem, page, x, y) {
   }
 };
 ```
+
+</details>
 
 ## Development
 

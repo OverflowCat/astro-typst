@@ -1,11 +1,12 @@
 ---
 import { getCollection } from "astro:content";
+import { Code } from "astro-expressive-code/components";
 import Typst from "../components/Typst.astro";
 import { TypstDocInput } from "../lib/prelude";
 import Simp from "./simp.typ";
 import SimpRaw from "./simp.typ?raw";
 import SimpHtml from "./_simp-html.typ?html";
-import JsxDemo from "./_jsx.typ?html";
+import DemoJsx from "./_DemoJsx.astro";
 import DynTypst from "../components/DynTypst.astro";
 
 const code = `
@@ -23,8 +24,8 @@ $ cal(A) := { x in RR | x "is natural" } $
 const input: TypstDocInput = {
   mainFilePath: "src/content/typ/test.typ",
   inputs: {
-    "something": "from Astro!",
-  }
+    something: "from Astro!",
+  },
 };
 
 const dynExample = `
@@ -35,7 +36,7 @@ const dynExample = `
   box(width: 35%)[#lorem(200)],
   box(width: 55%)[#lorem(250)]
 )
-`
+`;
 
 const collections = await getCollection("typ");
 ---
@@ -65,26 +66,33 @@ const collections = await getCollection("typ");
           ))
         }
       </ul>
-      <h2>1: string code</h2>
-      <Typst code={code} target="html" />
+      <!-- <Typst code={code} width={"100%"} height={"auto"} /> -->
+      <h2>1: <samp>svg</samp> output</h2>
+      <h3>1.1: Import as a component</h3>
+      <Code
+        lang="jsx"
+        code={`---
+import Simp from "./simp.typ";
+---
+<Simp />`}
+      />
+      <!--
       <h3>
         <code>width</code> set to <samp>"100%"</samp> and <code>height</code> set
         to <samp>"auto"</samp>
       </h3>
-      <h2>Hast & JSX</h2>
-      <JsxDemo />
-      <!-- <Typst code={code} width={"100%"} height={"auto"} /> -->
-      <h2>2: <samp>simp.typ</samp></h2>
-      <Simp astro="y">
-        123
-      </Simp>
-      <SimpHtml astro="y" data={456} />
-      <h3>2.1: In route</h3>
+      -->
+      <Simp />
+      <h3>1.1: In route</h3>
       <a href="/simp">/simp</a>
-      <h3>2.2: <code>raw</code> content</h3>
+      <h3>1.2: <code>raw</code> content</h3>
       <pre>{SimpRaw}</pre>
-      <h2>3: <samp>simp.typ html</samp></h2>
-      <SimpHtml test="haha" />
+      <h2>2: <samp>HTML export</samp></h2>
+      <SimpHtml />
+      <h3>2.1: string code & <code>#html.frame</code></h3>
+      <Typst code={code} target="html" />
+      <h2>3. Hast & JSX</h2>
+      <DemoJsx />
       <h2>4: <code>TypstDocInput</code></h2>
       <Typst input={input} />
       <h2>5: <code>mainFilePath</code></h2>
@@ -93,5 +101,13 @@ const collections = await getCollection("typ");
       <p>Work in progress</p>
       <!-- <DynTypst code={dynExample} /> -->
     </main>
+    <style>
+      body {
+        margin: clamp(1rem, 2vw, 3rem);
+        font-family: sans-serif;
+        font-size: 1.1rem;
+        max-inline-size: 1024px;
+      }
+    </style>
   </body>
 </html>

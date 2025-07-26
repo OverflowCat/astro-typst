@@ -1,28 +1,28 @@
 ---
 export type Props = {
   initialCount: number;
+  message: string;
 };
 
-const { initialCount } = Astro.props;
+const { initialCount, message } = Astro.props;
 
 let count = initialCount;
 ---
 
 <div>
-  <h3>Counter</h3>
-  <p id="count">{count}</p>
+  <p>Counter: <span id="count">{count}</span></p>
   <button id="increment">Increment</button>
-  <button id="jueqi">Jueqi</button>
+  <button id="msg">Alert</button>
 </div>
 
-<script>
-  const button = document.querySelector("button");
-  const p = document.querySelector("p#count");
+<script is:inline define:vars={{ message }}>
+  const button = document.querySelector("button#increment");
+  const p = document.querySelector("#count");
   button?.addEventListener("click", () => {
-    p!.textContent = (parseInt(p!.textContent!) + 1).toString();
+    p.textContent = (parseInt(p.textContent) + 1).toString();
   });
-  const jueqiButton = document.querySelector("button#jueqi");
-  jueqiButton?.addEventListener("click", () => {
-    alert("Typst 已经崛起了！");
+  const msgBtn = document.querySelector("button#msg");
+  msgBtn?.addEventListener("click", () => {
+    alert(`Message from ${message}!`);
   });
 </script>
