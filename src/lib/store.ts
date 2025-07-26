@@ -1,5 +1,5 @@
 import type { AstroConfig } from "astro";
-import type { AstroTypstConfig } from "./prelude";
+import type { AstroTypstConfig } from "./prelude.js";
 
 export function setConfig(config: AstroTypstConfig) {
     (global as any)._astroTypstConfig = config;

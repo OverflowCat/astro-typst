@@ -3,7 +3,7 @@ import { unified, type Parser } from "unified";
 import stringify from "rehype-stringify";
 // @ts-ignore
 import { createProcessor } from "typstx";
-import { getOrInitCompiler } from "./typst";
+import { getOrInitCompiler } from "./typst.js";
 
 export async function rehypeIt(hast: any, rehypePipe: RehypePlugins) {
   function typParse() {

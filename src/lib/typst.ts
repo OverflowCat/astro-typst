@@ -9,7 +9,7 @@ import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDoc
 // type DynLayoutCompiler = any;
 
 import { load } from "cheerio";
-import type { AstroTypstRenderOption, TypstDocInput } from "./prelude";
+import type { AstroTypstRenderOption, TypstDocInput } from "./prelude.js";
 import logger from "./logger.js";
 import { getConfig } from "./store.js";
 
