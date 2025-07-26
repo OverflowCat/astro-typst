@@ -39,6 +39,7 @@ const dynExample = `
 `;
 
 const collections = await getCollection("typ");
+const pkgVer = "0.12.0-beta.4";
 ---
 
 <html lang="en">
@@ -47,10 +48,13 @@ const collections = await getCollection("typ");
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
+    <title>Astro Typst Demo</title>
   </head>
   <body>
-    <h1><samp>astro-typst</samp> component playground</h1>
+    <header>
+      <h1><samp>astro-typst</samp> playground</h1>
+      <p>Version: <samp>{pkgVer}</samp> with {Astro.generator}</p>
+    </header>
     <main>
       <h2>0: Articles in the collection</h2>
       <ul>
