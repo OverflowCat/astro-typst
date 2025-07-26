@@ -1,4 +1,3 @@
-import fs from "fs/promises";
 import { type Plugin, type ViteDevServer } from "vite";
 import { renderToHTMLish } from "./typst.js";
 import { pathToFileURL } from "node:url";
@@ -118,6 +117,7 @@ export default function (config: AstroTypstConfig): Plugin {
                 html = imgSvg;
             } else if (isHtml) { // output is actually hast
                 if (typeof html === 'string') {
+                    console.warn(html);
                     throw new Error("html is a string, but it should be a hast object");
                 }
                 html = await rehypeTypstx(html, astroConfig.markdown?.rehypePlugins ?? []);

@@ -9,8 +9,6 @@ import { defaultTarget, detectTarget, type AstroTypstConfig } from "./prelude.js
 import { setAstroConfig, setConfig } from "./store.js";
 import logger from "./logger.js";
 
-const PACKAGE_NAME = 'astro-typst';
-
 function getRenderer(): AstroRenderer {
     const isDebug = !!process.env.ASTRO_TYPST;
     const serverEntrypoint = (isDebug ? "" : "astro-typst/") + "dist/renderer/index.js";

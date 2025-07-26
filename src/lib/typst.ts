@@ -220,7 +220,7 @@ export async function renderToHTMLish(
     var html: string;
     var getFrontmatter = () => ({});
     if (isHtml) {
-        source.body = options?.body !== false;
+        // source.body = options?.body !== false;
         let { html: htmlRes, frontmatter } = await renderToHTML(
             source, options
         );
