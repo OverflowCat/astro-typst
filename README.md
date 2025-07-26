@@ -38,6 +38,8 @@ yarn add astro-typst
 
 ## Usage
 
+Checkout the [live demo](https://typst.overflow.cat)!
+
 ### As an integration
 
 ```js
@@ -59,8 +61,10 @@ export default defineConfig({
           return "html";
         return "svg";
       },
+      // === <img src="xxx.svg"> instead of inlined <svg> ===
       // emitSvg: true,
       // emitSvgDir: ".astro/typst"
+      // === Add non-system fonts here ===
       // fontArgs: [
       //   { fontPaths: ['/system/fonts', '/user/fonts'] },
       //   { fontBlobs: [customFontBuffer] }
@@ -77,7 +81,6 @@ The `target` function determines which mode a file will render in. The default i
  *.svg.typ =>  svg export
 **/html/** => html export
  **/svg/** =>  svg export
-other => use the value of mode.default
 ```
 
 Then you can use `.typ` files just like anything else in Astro: render directly by router, or import in another file.
@@ -231,6 +234,9 @@ yields
   "date": "datetime(year: 2024, month: 8, day: 7)"
 }
 ```
+
+This is only a demo for how various typst types will be converted;
+you don't need to use all of them.
 
 ### Internal links
 
