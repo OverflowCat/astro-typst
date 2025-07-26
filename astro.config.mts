@@ -2,6 +2,8 @@ import { defineConfig } from "astro/config";
 import typst from "./src/lib/integration.js";
 import { type AstroIntegration } from "astro";
 
+import react from "@astrojs/react";
+
 /**
  * This is only for the demo site.
  * It has no effect when you are importing the package.
@@ -18,20 +20,17 @@ const debug: AstroIntegration = {
 // https://astro.build/config
 export default defineConfig({
     outDir: "dist-demo",
-    integrations: [
-        debug,
-        typst({
-            options: {
-                remPx: 14
-            },
-            target: (id: string) => {
-                console.debug(`Detecting ${id}`);
-                if (id.endsWith('.html.typ') || id.includes('/html/'))
-                    return "html";
-                return "svg";
-            },
-            emitSvg: true,
-            emitSvgDir: ".astro/typst",
-        })
-    ]
+    integrations: [debug, typst({
+        options: {
+            remPx: 14
+        },
+        target: (id: string) => {
+            console.debug(`Detecting ${id}`);
+            if (id.endsWith('.html.typ') || id.includes('/html/'))
+                return "html";
+            return "svg";
+        },
+        emitSvg: true,
+        emitSvgDir: ".astro/typst",
+    }), react()]
 });

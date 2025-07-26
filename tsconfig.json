@@ -1,14 +1,23 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["src/**/*.ts", "global.d.ts"],
-  "exclude": ["dist"],
+  "include": [
+    "src/**/*.ts",
+    "global.d.ts"
+  ],
+  "exclude": [
+    "dist"
+  ],
   "compilerOptions": {
-    "lib": ["ES2024"],
+    "lib": [
+      "ES2024"
+    ],
     "outDir": "./dist",
     "allowImportingTsExtensions": false,
     "noEmit": false,
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-  },
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  }
 }
