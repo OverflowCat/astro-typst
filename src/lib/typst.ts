@@ -72,7 +72,7 @@ export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument |
  * @param options Options for rendering the SVG.
  * @returns The SVG string.
  */
-export async function renderToSVGString(source: TypstDocInput, options: AstroTypstRenderOption) {
+export async function renderToSVGString(source: TypstDocInput, options: AstroTypstRenderOption | undefined) {
     source = prepareSource(source, options);
     const $typst = source.mainFileContent ? getOrInitCompiler() : initCompiler();
     const svg = await renderToSVGString_($typst, source);
@@ -81,32 +81,32 @@ export async function renderToSVGString(source: TypstDocInput, options: AstroTyp
         xml: true,
     });
     (options?.cheerio?.preprocess) && ($ = options?.cheerio?.preprocess($, source));
-    const remPx = options.remPx || 16;
+    const remPx = options?.remPx || 16;
     const width = $("svg").attr("width");
-    if (options.width === undefined && width !== undefined) {
+    if (options?.width === undefined && width !== undefined) {
         const remWidth = parseFloat(width) * 2 / remPx;
         $("svg").attr("width", `${remWidth}rem`);
     } else {
-        $("svg").attr("width", options.width);
+        $("svg").attr("width", options?.width);
     }
     const height = $("svg").attr("height");
-    if (options.height === undefined && height !== undefined) {
+    if (options?.height === undefined && height !== undefined) {
         const remHeight = parseFloat(height) * 2 / remPx;
         $("svg").attr("height", `${remHeight}rem`);
-    } else {
-        $("svg").attr("height", options.height);
+    } else if (options?.height) {
+        $("svg").attr("height", options?.height);
     }
 
-    if (options.style === false) {
+    if (options?.style === false) {
         $("style").remove();
     }
-    if (options.props) {
-        for (const [key, value] of Object.entries(options.props)) {
+    if (options?.props) {
+        for (const [key, value] of Object.entries(options?.props)) {
             $("svg").attr(key, value as any);
         }
     }
-    (options.cheerio?.postprocess) && ($ = options?.cheerio?.postprocess($, source));
-    const svgString = options.cheerio?.stringify ? options.cheerio.stringify($, source) : $.html();
+    (options?.cheerio?.postprocess) && ($ = options?.cheerio?.postprocess($, source));
+    const svgString = options?.cheerio?.stringify ? options?.cheerio?.stringify($, source) : $.html();
     // @ts-ignore
     return { svg: svgString, frontmatter: () => getFrontmatter($typst, source) };
 }
@@ -190,7 +190,7 @@ export async function renderToHast(
     source: TypstDocInput & { body?: boolean },
     options: any,
 ) {
-    const onlyBody = source.body !== false;
+    const onlyBody = source?.body !== false;
     source = prepareSource(source, options);
     const $typst = getOrInitCompiler();
     const docRes = $typst.compileHtml(source);
@@ -214,12 +214,13 @@ export async function renderToHast(
 
 export async function renderToHTMLish(
     source: TypstDocInput & { body?: boolean | "hast" },
-    options: any,
+    options: Record<string, any> | undefined,
     isHtml: boolean = true,
 ) {
     var html: string;
     var getFrontmatter = () => ({});
     if (isHtml) {
+        source.body = options?.body !== false;
         let { html: htmlRes, frontmatter } = await renderToHTML(
             source, options
         );
