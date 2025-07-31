@@ -1,5 +1,10 @@
 ---
 import { renderToSVGString, renderToHTML } from "../lib/typst.js";
+import { unified } from "unified";
+import rehypeParse from "rehype-parse";
+import rehypeFormat from "rehype-format";
+import rehypeStringify from "rehype-stringify";
+import rehypeSlots from "rehype-slots";
 
 import type { TypstDocInput } from "../lib/prelude.js";
 
@@ -51,10 +56,34 @@ let input: TypstDocInput =
           ? options.code
           : options.input;
 
-const html =
-    options.target === "html"
-        ? (await renderToHTML(input, options)).html
-        : (await renderToSVGString(input, options)).svg;
+let renderResult: string;
+
+if (options.target === "html") {
+    const html = (await renderToHTML(input, options)).html;
+
+    const slotContents: Record<string, import('unist').Node> = {};
+
+    for (const slotName of Object.keys(Astro.slots)) {
+        const htmlString = await Astro.slots.render(slotName);
+
+        // Parse HTML string to HAST tree
+        const hastTree = unified()
+            .use(rehypeParse, { fragment: true })
+            .parse(htmlString);
+
+        slotContents[slotName] = hastTree;
+    }
+
+    renderResult = await unified()
+        .use(rehypeParse, { fragment: true })
+        .use(rehypeSlots, { values: slotContents }) // <-- attach the rehype-slots plugin
+        .use(rehypeFormat)
+        .use(rehypeStringify)
+        .process(html)
+        .then(String);
+} else {
+    renderResult = (await renderToSVGString(input, options)).svg;
+}
 ---
 
-<div set:html={html} />
+<div set:html={renderResult} />

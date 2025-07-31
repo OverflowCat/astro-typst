@@ -1,0 +1,17 @@
+---
+import Typst from "../components/Typst.astro";
+
+const input = {
+    mainFilePath: "src/pages/slot-template.typ",
+    inputs: {},
+};
+---
+
+<Typst input={input} target="html">
+    <p>This content should appear in the default slot!</p>
+
+    <Fragment slot="quote">
+        <h3>Sidebar Content</h3>
+        <p>This is sidebar content that should replace the sidebar slot.</p>
+    </Fragment>
+</Typst>
