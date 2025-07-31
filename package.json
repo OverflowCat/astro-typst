@@ -43,6 +43,9 @@
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
     "astro-integration-kit": "^0.18.0",
+    "rehype-format": "^5.0.1",
+    "rehype-parse": "^9.0.1",
+    "rehype-slots": "^0.3.2",
     "rehype-stringify": "^10.0.1",
     "typstx": "0.0.1-beta.1",
     "unified": "^11.0.5"
