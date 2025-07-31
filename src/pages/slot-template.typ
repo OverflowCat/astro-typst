@@ -26,16 +26,15 @@
       == A default slot
 
       #html.elem("div", attrs: (class: "slot-container"))[
-        *Before slot, A content will be inserted here*
+        _A default slot will be replaced with its content here:_
         #html.elem("slot")[
           Default slot content
         ]
-        *After slot*
       ]
 
       == named slot
       #html.elem("div", attrs: (class: "slot-container"))[
-        *A slot with a name will be replaced with its content here:*
+        _A slot with a name will be replaced with its content here:_
         #html.elem("slot", attrs: (name: "quote"))[
           Quote slot content
         ]
@@ -43,7 +42,7 @@
 
       #html.elem("footer")[
         #html.elem("p")[
-          Created by Uwni on July 31, 2025
+          Footer
         ]
       ]
     ]
