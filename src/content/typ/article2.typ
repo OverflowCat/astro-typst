@@ -17,6 +17,13 @@
 
 == `astro-typst` playground
 
+=== How to insert an image
+
+To insert an image here, simply use the built-in `#image` function.
+#image("/public/typst.svg")
+
+Note: The file is converted into SVG format. For more details, refer to the setting in `astro.config.mts`.
+
 === Include other files
 
 #include "../../pages/_included.typ"
