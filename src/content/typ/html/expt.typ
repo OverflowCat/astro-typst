@@ -20,3 +20,16 @@
 
 又 $f approx display(c / lambda)$，有$ |Delta f| approx (c / (lambda P)) times (4 A Omega / c) = (4 A) / (lambda P) Omega. $
 这个拍频 $Delta f$ 就是环形激光陀螺中测量的量。记前面的系数 $display((4 A) / (lambda P) = S)$ 即为激光陀螺的标度因数。
+
+=== How to insert an image
+
+To insert an image here for html output, you need the experimental functions from `#html`: https://typst.app/blog/2025/typst-0.13/#a-first-look-at-html-export
+
+There are two ways to insert the same image:
+#html.elem("img", attrs: (src: "/typst.svg"))
+
+\
+
+#html.frame(image("/public/typst.svg"))
+
+Note: The file is converted into html format. For more details, refer to the setting in `astro.config.mts`.

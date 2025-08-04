@@ -1,7 +1,7 @@
 {
   "name": "astro-typst",
   "type": "module",
-  "version": "0.12.0-beta.5",
+  "version": "0.12.0-beta.6",
   "packageManager": "pnpm@10.11.0",
   "repository": {
     "type": "git",
