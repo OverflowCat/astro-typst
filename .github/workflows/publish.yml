@@ -10,11 +10,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - uses: pnpm/action-setup@v4
       - run: pnpm install
       - run: pnpm build
       - run: npm publish --provenance --access public
@@ -33,6 +38,7 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
+      - uses: pnpm/action-setup@v4
       - run: pnpm install
       - run: pnpm build
         env:
