@@ -1,6 +1,5 @@
 import { NodeCompiler, DynLayoutCompiler, type CompileDocArgs, type NodeTypstDocument, type CompileArgs } from "@myriaddreamin/typst-ts-node-compiler";
 // import TypstTsCompiler from "@myriaddreamin/typst-ts-node-compiler";
-// console.log({TypstTsCompiler});
 // const { NodeCompiler, DynLayoutCompiler, } = TypstTsCompiler;
 // type CompileArgs = any;
 // type NodeTypstDocument = any;
@@ -172,13 +171,21 @@ export async function renderToHTML(
         html.printDiagnostics();
         return { html: "" };
     }
+    var output;
+    if (onlyBody === "hast") {
+        try {
+            output = html.result.hast();
+        } catch (error) {
+            console.error(error);
+            logger.error("Please check if your peer dependencies (@myriaddreamin/typst-ts*) is >= 0.6.1-rc2.");
+        }
+    } else {
+        output = onlyBody !== false ?
+            html.result.body() :
+            html.result.html();
+    }
     return {
-        html:
-            onlyBody === "hast" ?
-                html.result.hast() :
-                onlyBody !== false ?
-                    html.result.body() :
-                    html.result.html(),
+        html: output,
         frontmatter: () => getFrontmatter($typst, doc),
     };
 }
