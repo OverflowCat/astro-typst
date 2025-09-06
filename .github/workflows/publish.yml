@@ -15,6 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: pnpm/action-setup@v4
       - run: pnpm install
       - run: pnpm build
       - run: npm publish --provenance --access public
@@ -33,6 +34,7 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
+      - uses: pnpm/action-setup@v4
       - run: pnpm install
       - run: pnpm build
         env:

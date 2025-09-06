@@ -36,6 +36,14 @@ pnpm add astro-typst
 yarn add astro-typst
 ```
 
+The latest stable version (0.12) needs the following beta versions of `typst.ts`:
+
+```json
+    "@myriaddreamin/typst-ts-node-compiler": ">=0.6.1-rc2",
+    "@myriaddreamin/typst-ts-renderer": ">=0.6.1-rc2",
+    "@myriaddreamin/typst.ts": ">=0.6.1-rc2",
+```
+
 ## Usage
 
 Checkout the [live demo](https://typst.overflow.cat)!
