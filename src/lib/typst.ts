@@ -190,35 +190,6 @@ export async function renderToHTML(
     };
 }
 
-/** 
- * @deprecated Need to be removed
- */
-export async function renderToHast(
-    source: TypstDocInput & { body?: boolean },
-    options: any,
-) {
-    const onlyBody = source?.body !== false;
-    source = prepareSource(source, options);
-    const $typst = getOrInitCompiler();
-    const docRes = $typst.compileHtml(source);
-    if (!docRes.result) {
-        logger.error("Error compiling typst to HTML");
-        docRes.printDiagnostics();
-        return { html: "" };
-    }
-    const doc = docRes.result;
-    const html = $typst.tryHtml(doc);
-    if (!html.result) {
-        html.printDiagnostics();
-        return { html: "" };
-    }
-    return {
-        html: html.result.hast(),
-        frontmatter: () => getFrontmatter($typst, doc),
-    };
-}
-
-
 export async function renderToHTMLish(
     source: TypstDocInput & { body?: boolean | "hast" },
     options: Record<string, any> | undefined,

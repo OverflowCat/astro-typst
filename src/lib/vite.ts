@@ -8,7 +8,7 @@ import path from "node:path/posix";
 import { getAstroConfig } from "./store.js";
 
 function isTypstFile(id: string) {
-    return /\.typ(\?(html|svg|html&body|body&html))?$/.test(id);
+    return /\.typ(\?(html|svg|html&body|body&html|html-text|html-hast))?$/.test(id);
 }
 function extractOpts(id: string) {
     const q = id.lastIndexOf('?');
@@ -76,11 +76,18 @@ export default function (config: AstroTypstConfig): Plugin {
             }
             let emitSvg = opts.includes('img') || config?.emitSvg === true;
 
+            let htmlMode = config.htmlMode ?? 'hast';
+            if (
+                opts.includes('html-text')
+                || opts.includes('htxt')
+            )
+                htmlMode = 'text';
+
             let { html, getFrontmatter } = await renderToHTMLish(
                 {
                     mainFilePath,
                     // TODO: remove body; autodetect after the render process is delayed
-                    body: "hast",
+                    body: htmlMode === 'hast' ? "hast" : true,
                 },
                 config.options,
                 isHtml
@@ -116,14 +123,16 @@ export default function (config: AstroTypstConfig): Plugin {
                 }
                 html = imgSvg;
             } else if (isHtml) { // output is actually hast
-                if (typeof html === 'string') {
-                    console.warn(html);
-                    throw new Error("html is a string, but it should be a hast object");
+                if (htmlMode === 'hast') {
+                    if (typeof html === 'string') {
+                        console.warn(html);
+                        throw new Error("html is a string, but it should be a hast object");
+                    }
+                    html = await rehypeTypstx(html, astroConfig.markdown?.rehypePlugins ?? []);
                 }
-                html = await rehypeTypstx(html, astroConfig.markdown?.rehypePlugins ?? []);
             }
 
-            const code = isHtml ? html + "\nexport const Content = MDXContent" : `
+            const code = (isHtml && htmlMode === 'hast') ? html + "\nexport const Content = MDXContent" : `
 import { createComponent, render, renderJSX, renderComponent, unescapeHTML } from "astro/runtime/server/index.js";
 import { AstroJSX, jsx } from 'astro/jsx-runtime';
 import { readFileSync } from "node:fs";

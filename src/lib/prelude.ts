@@ -58,6 +58,13 @@ export type AstroTypstConfig = {
      * @example ".astro/typst"
      */
     emitSvgDir?: string;
+    /**
+     * The mode for HTML output.
+     * - 'hast': Output HAST tree (supports rehype plugins).
+     * - 'text': Output pure HTML string (no rehype plugins).
+     * @default 'hast'
+     */
+    htmlMode?: 'hast' | 'text';
 };
 
 
