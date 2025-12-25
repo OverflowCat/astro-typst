@@ -34,6 +34,7 @@ export default defineConfig({
                     return "html";
                 return "svg";
             },
+            htmlMode: "text",
             emitSvg: true,
             emitSvgDir: ".astro/typst",
         }),
