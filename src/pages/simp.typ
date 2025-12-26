@@ -7,7 +7,7 @@
 }
 
 #let render = () => [
-  + Hello, typst!
+  + Hello, typst v#sys.version!
 ]
 
 #repeat(10, render)

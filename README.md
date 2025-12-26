@@ -1,7 +1,9 @@
 # `astro-typst`
 
 ![NPM Version](https://img.shields.io/npm/v/astro-typst?style=for-the-badge)
-<a href='https://typst.app/' target="_blank"><img alt='Supported Typst version: 0.13' src='https://img.shields.io/badge/Typst_0.13-100000?style=for-the-badge&logo=Typst&logoColor=30bdc1&labelColor=FFFFFF&color=30BDB2' />
+<a href='https://typst.app/' target="_blank">
+<img alt='Supported Typst version: 0.13' src='https://img.shields.io/badge/Typst_0.13-100000?style=for-the-badge&logo=Typst&logoColor=30bdc1&labelColor=FFFFFF&color=30BDB2' />
+<img alt='Supported Typst version: 0.14' src='https://img.shields.io/badge/Typst_0.14-100000?style=for-the-badge&logo=Typst&logoColor=30bdc1&labelColor=FFFFFF&color=30BDB2' />
 
 An Astro [Integration](https://astro.build/integrations/) that lets you render [Typst](https://github.com/typst/typst) within [Astro](https://github.com/withastro/astro) based on [typst.ts](https://github.com/Myriad-Dreamin/typst.ts). We have made you an Astro-ish wrapper that you cannot refuse!
 
@@ -20,7 +22,7 @@ An Astro [Integration](https://astro.build/integrations/) that lets you render [
 - [x] Write frontmatter directly in `.typ`
 - [x] Jump between internal links ([client JS](https://github.com/OverflowCat/astro-typst/issues/6) needed)
 - [x] Pass JS data to typst using the component ([how](https://github.com/OverflowCat/astro-typst/issues/2))
-- [ ] Pass data from typst to JS
+- [ ] Query data from typst to JS
 - [x] Render to `<img>` with `src=` emitted SVG assets (#20)
 - [ ] Responsive SVGs
 - [ ] [Paged output](https://github.com/OverflowCat/astro-typst/issues/3)
@@ -38,10 +40,35 @@ yarn add astro-typst
 
 The latest stable version (0.12) needs the following beta versions of `typst.ts`:
 
+> [!IMPORTANT]
+> You must install the following peer dependencies to select a typst version.
+
 ```json
+  "dependencies": {
+    ...
     "@myriaddreamin/typst-ts-node-compiler": ">=0.6.1-rc2",
     "@myriaddreamin/typst-ts-renderer": ">=0.6.1-rc2",
     "@myriaddreamin/typst.ts": ">=0.6.1-rc2",
+    ...
+  }
+```
+
+To use typst v0.13, please install `@0.6.1-rc5` and later release candidates:
+
+```json
+    "@myriaddreamin/typst-ts-node-compiler": "^0.6.1-rc5",
+    "@myriaddreamin/typst-ts-renderer": "^0.6.1-rc5",
+    "@myriaddreamin/typst.ts": "0.6.1-rc5",
+```
+
+To use typst v0.14, you need to install later typst.ts versions, respectively:
+
+![NPM Version](https://img.shields.io/npm/v/@myriaddreamin/typst.ts?style=for-the-badge)
+
+```json
+    "@myriaddreamin/typst-ts-node-compiler": "^0.7.0-rc2",
+    "@myriaddreamin/typst-ts-renderer": "^0.7.0-rc2",
+    "@myriaddreamin/typst.ts": "0.7.0-rc2",
 ```
 
 ## Usage
@@ -69,6 +96,8 @@ export default defineConfig({
           return "html";
         return "svg";
       },
+      // === Use html-text output rather than hAST ===
+      // htmlMode: "text", // added in v0.12.3
       // === <img src="xxx.svg"> instead of inlined <svg> ===
       // emitSvg: true,
       // emitSvgDir: ".astro/typst"
