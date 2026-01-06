@@ -33,18 +33,20 @@ type SetupHookParams = HookParameters<'astro:config:setup'> & {
 const { resolve: resolver } = createResolver(import.meta.url);
 
 export default function typstIntegration(
-    config: AstroTypstConfig = {
-        options: {
-            remPx: 16
-        },
-        target: defaultTarget,
-    }
+    config: Partial<AstroTypstConfig> = {}
 ): AstroIntegration {
+    const astroTypstConfig: AstroTypstConfig = {
+        options: {
+            remPx: 16,
+            ...config.options,
+        },
+        target: config.target ?? defaultTarget,
+    };
     return {
         name: 'typst',
         hooks: {
             "astro:config:setup": (options) => {
-                setConfig(config);
+                setConfig(astroTypstConfig);
                 setAstroConfig(options.config);
                 const {
                     addRenderer, addContentEntryType, addPageExtension, updateConfig
@@ -56,12 +58,12 @@ export default function typstIntegration(
                     extensions: ['.typ'],
                     async getEntryInfo({ fileUrl, contents }) {
                         const mainFilePath = fileURLToPath(fileUrl);
-                        const isHtml = await detectTarget(fileUrl.pathname, config.target) === "html";
+                        const isHtml = await detectTarget(fileUrl.pathname, astroTypstConfig.target) === "html";
                         let { getFrontmatter } = await renderToHTMLish(
                             {
                                 mainFilePath,
                             },
-                            config?.options,
+                            astroTypstConfig?.options,
                             isHtml
                         )
                         const frontmatterResult = getFrontmatter?.();
@@ -95,7 +97,7 @@ declare module 'astro:content' {
                             }
                         },
                         // @ts-ignore
-                        plugins: [nodeResolve(), vitePluginTypst(config) as PluginOption],
+                        plugins: [nodeResolve(), vitePluginTypst(astroTypstConfig) as PluginOption],
                     },
                 });
             },
