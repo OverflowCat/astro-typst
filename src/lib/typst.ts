@@ -74,7 +74,7 @@ export function getFrontmatter($typst: NodeCompiler, source: NodeTypstDocument |
 export async function renderToSVGString(source: TypstDocInput, options: AstroTypstRenderOption | undefined) {
     source = prepareSource(source, options);
     const $typst = source.mainFileContent ? getOrInitCompiler() : initCompiler();
-    const svg = await renderToSVGString_($typst, source);
+    const { svg, doc } = await renderToSVGString_($typst, source);
     $typst.evictCache(60);
     let $ = load(svg, {
         xml: true,
@@ -107,21 +107,24 @@ export async function renderToSVGString(source: TypstDocInput, options: AstroTyp
     (options?.cheerio?.postprocess) && ($ = options?.cheerio?.postprocess($, source));
     const svgString = options?.cheerio?.stringify ? options?.cheerio?.stringify($, source) : $.html();
     // @ts-ignore
-    return { svg: svgString, frontmatter: () => getFrontmatter($typst, source) };
+    return {
+        svg: svgString,
+        frontmatter: () => doc ? getFrontmatter($typst, doc) : {},
+    };
 }
 
 async function renderToSVGString_(
     $typst: NodeCompiler,
     source: CompileDocArgs,
-): Promise<string> {
+): Promise<{ svg: string; doc?: NodeTypstDocument }> {
     const docRes = $typst.compile(source);
     if (!docRes.result) {
         docRes.printDiagnostics();
-        return "";
+        return { svg: "" };
     }
     const doc = docRes.result;
     const svg = $typst.svg(doc);
-    return svg;
+    return { svg, doc };
 }
 
 export async function renderToVectorFormat(
