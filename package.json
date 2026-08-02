@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@astrojs/react": "^6.0.2",
+    "@astrojs/react": "^5.0.7",
     "@myriaddreamin/typst-ts-node-compiler": "0.8.0-rc3",
     "@myriaddreamin/typst-ts-renderer": "0.8.0-rc3",
     "@myriaddreamin/typst.ts": "0.8.0-rc3",
@@ -61,7 +61,7 @@
     "react": "^19.2.8",
     "react-confetti-explosion": "^3.0.3",
     "react-dom": "^19.2.8",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "vite": "^7.3.6"
   },
   "peerDependencies": {

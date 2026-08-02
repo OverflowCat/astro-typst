@@ -11,6 +11,7 @@
     "lib": [
       "ES2024"
     ],
+    "rootDir": "./src",
     "outDir": "./dist",
     "allowImportingTsExtensions": false,
     "noEmit": false,

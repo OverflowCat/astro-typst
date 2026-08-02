@@ -11,6 +11,6 @@ const typCollection = defineCollection({
     })
 });
 
-export const collections = {
+export const collections: Record<string, ReturnType<typeof defineCollection>> = {
     'typ': typCollection,
 };
