@@ -42,27 +42,27 @@
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
-    "astro-integration-kit": "^0.19.0",
+    "astro-integration-kit": "^0.20.0",
     "rehype-stringify": "^10.0.1",
     "typstx": "0.0.1",
     "unified": "^11.0.5"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/react": "^4.3.0",
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/react": "^6.0.2",
     "@myriaddreamin/typst-ts-node-compiler": "0.8.0-rc3",
     "@myriaddreamin/typst-ts-renderer": "0.8.0-rc3",
     "@myriaddreamin/typst.ts": "0.8.0-rc3",
     "@types/node": "^22.18.0",
-    "@types/react": "^19.1.11",
-    "@types/react-dom": "^19.1.8",
-    "astro": "5.13.5",
-    "astro-expressive-code": "^0.41.3",
-    "react": "^19.1.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "astro": "6.4.8",
+    "astro-expressive-code": "^0.44.1",
+    "react": "^19.2.8",
     "react-confetti-explosion": "^3.0.3",
-    "react-dom": "^19.1.1",
-    "typescript": "^5.9.2",
-    "vite": "^6.3.5"
+    "react-dom": "^19.2.8",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6"
   },
   "peerDependencies": {
     "@myriaddreamin/typst-ts-node-compiler": ">=0.6.1-rc2",
