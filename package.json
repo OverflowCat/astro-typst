@@ -50,6 +50,9 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/react": "^4.3.0",
+    "@myriaddreamin/typst-ts-node-compiler": "0.8.0-rc3",
+    "@myriaddreamin/typst-ts-renderer": "0.8.0-rc3",
+    "@myriaddreamin/typst.ts": "0.8.0-rc3",
     "@types/node": "^22.18.0",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.8",
