@@ -1,6 +1,6 @@
 ---
-import JsxDemo from "./_jsx.typ?html";
-import jsxDemoCode from "./_jsx.typ?raw";
+import JsxDemo from "./_jsx.html.typ?html";
+import jsxDemoCode from "./_jsx.html.typ?raw";
 import counterCode from "../components/Counter.astro?raw";
 import ConfettiBtn from "../components/ConfettiBtn.jsx";
 import confettiBtnCode from "../components/ConfettiBtn.tsx?raw";
@@ -13,7 +13,7 @@ import { Code } from "astro-expressive-code/components";
   <details>
     <summary>Source code</summary>
     <Code
-      title="_jsx.typ"
+      title="_jsx.html.typ"
       lang="typst"
       code={jsxDemoCode}
       mark={[1, "#jsx"]}

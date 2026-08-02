@@ -59,9 +59,9 @@ const pkgVer = "0.12.0-beta.4";
       <h2>0: Articles in the collection</h2>
       <ul>
         {
-          collections.map(({ slug, data }) => (
+          collections.map(({ id, data }) => (
             <li>
-              <a href={`/${slug}`}>
+              <a href={`/${id}`}>
                 <h3>{data.title}</h3>
               </a>
               by
